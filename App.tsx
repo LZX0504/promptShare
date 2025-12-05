@@ -22,6 +22,11 @@ const LandingPage: React.FC<{ onStart: () => void }> = ({ onStart }) => {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto py-20">
+        <div className="inline-flex items-center px-3 py-1 rounded-full bg-zinc-100 text-xs font-medium text-zinc-800 mb-8 border border-zinc-200">
+          <Sparkles className="w-3 h-3 mr-2" />
+          现已支持 Gemini AI 智能优化
+        </div>
+        
         <h1 className="text-5xl sm:text-7xl font-bold text-zinc-900 tracking-tight mb-8 leading-[1.1]">
           发现与分享 <br />
           <span className="text-zinc-400">专业级 AI 提示词</span>
@@ -234,8 +239,11 @@ const App: React.FC = () => {
 
           <footer className={`bg-white border-t border-zinc-100 py-8 ${view === 'landing' ? 'fixed bottom-0 w-full' : ''}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-              <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <div className="flex flex-col md:flex-row items-center md:items-baseline space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
                  <span className="font-semibold text-zinc-900 tracking-tight">PromptShare</span>
+                 <span className="text-xs text-zinc-500 font-medium">
+                    商业合作 Email: iamcker@outlook.com / +v: lewlel
+                 </span>
               </div>
               <p className="text-sm text-zinc-400">
                 © 2025 PromptShare. Build by Chris Mai
