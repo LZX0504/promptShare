@@ -13,7 +13,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (prompt.isPaid) return;
+    if (prompt.is_paid) return;
     navigator.clipboard.writeText(prompt.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -36,7 +36,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
     >
       {/* Badge */}
       <div className="absolute top-4 right-4 z-10">
-        {prompt.isPaid ? (
+        {prompt.is_paid ? (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-900 text-white">
             ￥{prompt.price}
           </span>
@@ -58,7 +58,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
 
       {/* Content Preview */}
       <div className="relative mb-4 flex-grow bg-zinc-50 rounded-lg p-3 border border-zinc-100 font-mono text-xs text-zinc-600 overflow-hidden">
-        {prompt.isPaid ? (
+        {prompt.is_paid ? (
             <div className="flex flex-col items-center justify-center h-24 text-zinc-400">
                 <Lock className="w-6 h-6 mb-2 opacity-50" />
                 <span>付费内容</span>
@@ -87,7 +87,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
                 <span className="sr-only">Like</span>
             </button>
             
-            {!prompt.isPaid && (
+            {!prompt.is_paid && (
                 <button 
                     onClick={handleCopy}
                     className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
@@ -97,7 +97,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
                 </button>
             )}
             
-            {prompt.isPaid && (
+            {prompt.is_paid && (
                  <button 
                  onClick={handleBuy}
                  className="p-1.5 px-3 rounded-md bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition-colors"

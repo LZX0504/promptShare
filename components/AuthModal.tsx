@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User as UserIcon, ArrowRight } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from './Button';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,8 +9,11 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const [isLoginView, setIsLoginView] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,12 +22,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate auth logic
-    const username = formData.name || formData.email.split('@')[0];
-    login(username, formData.email);
-    onClose();
+    setIsLoading(true);
+    setErrorMsg('');
+
+    try {
+      if (isLoginView) {
+        const { error } = await login(formData.email, formData.password);
+        if (error) throw error;
+      } else {
+        const { error } = await register(formData.name, formData.email, formData.password);
+        if (error) throw error;
+      }
+      onClose();
+      // Reset form
+      setFormData({ name: '', email: '', password: '' });
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message || 'Authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -49,6 +68,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 : '加入 PromptShare，开启您的 AI 之旅'}
             </p>
           </div>
+
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg flex items-start text-sm text-red-600">
+              <AlertTriangle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLoginView && (
@@ -93,14 +119,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   value={formData.password}
                   onChange={e => setFormData({...formData, password: e.target.value})}
                   className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-zinc-900 focus:border-transparent outline-none transition-all text-sm"
-                  placeholder="••••••••"
+                  placeholder="至少 6 位字符"
+                  minLength={6}
                 />
               </div>
             </div>
 
-            <Button type="submit" className="w-full mt-6 flex justify-between group">
+            <Button type="submit" isLoading={isLoading} className="w-full mt-6 flex justify-between group">
               <span>{isLoginView ? '登录' : '注册'}</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {!isLoading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
             </Button>
           </form>
 
@@ -108,7 +135,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <p className="text-sm text-zinc-600">
               {isLoginView ? '还没有账号？' : '已有账号？'}
               <button 
-                onClick={() => setIsLoginView(!isLoginView)}
+                onClick={() => {
+                  setIsLoginView(!isLoginView);
+                  setErrorMsg('');
+                }}
                 className="ml-1 font-semibold text-zinc-900 hover:underline"
               >
                 {isLoginView ? '立即注册' : '直接登录'}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, AlertCircle, Lock } from 'lucide-react';
+import { X, Sparkles, AlertCircle, Lock } from 'lucide-react';
 import { Button } from './Button';
 import { CreatePromptForm } from '../types';
+import { optimizePromptDraft } from '../services/geminiService';
 import { usePrompts } from '../contexts/PromptContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -14,6 +15,9 @@ interface CreatePromptModalProps {
 export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ isOpen, onClose, onOpenAuthModal }) => {
   const { addPrompt } = usePrompts();
   const { user } = useAuth();
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [form, setForm] = useState<CreatePromptForm>({
     title: '',
     description: '',
@@ -35,7 +39,20 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ isOpen, on
     setForm(prev => ({ ...prev, [name]: checked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleOptimize = async () => {
+    if (!form.content.trim()) return;
+    setIsOptimizing(true);
+    try {
+      const optimizedContent = await optimizePromptDraft(form.content);
+      setForm(prev => ({ ...prev, content: optimizedContent }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Check Logic: Paid prompts require user to be logged in
@@ -44,30 +61,36 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ isOpen, on
       return;
     }
 
-    const newPrompt = {
-      id: Date.now().toString(),
-      title: form.title,
-      description: form.description,
-      content: form.content,
-      tags: form.tags.split(/[,，]/).map(t => t.trim()).filter(Boolean),
-      author: user ? user.name : 'Guest', // Use logged in user name or Guest
-      likes: 0,
-      isPaid: form.isPaid,
-      price: form.isPaid ? parseFloat(form.price) : 0,
-      createdAt: new Date().toISOString().split('T')[0],
-      comments: []
-    };
-    addPrompt(newPrompt);
-    onClose();
-    // Reset form
-    setForm({
-      title: '',
-      description: '',
-      content: '',
-      tags: '',
-      isPaid: false,
-      price: ''
-    });
+    setIsSubmitting(true);
+    
+    try {
+        const success = await addPrompt({
+            title: form.title,
+            description: form.description,
+            content: form.content,
+            tags: form.tags.split(/[,，]/).map(t => t.trim()).filter(Boolean),
+            author_name: user ? user.name : 'Guest',
+            is_paid: form.isPaid,
+            price: form.isPaid ? parseFloat(form.price) : 0,
+        });
+
+        if (success) {
+            onClose();
+            // Reset form
+            setForm({
+              title: '',
+              description: '',
+              content: '',
+              tags: '',
+              isPaid: false,
+              price: ''
+            });
+        }
+    } catch (e) {
+        console.error("Failed to create prompt", e);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -111,8 +134,17 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ isOpen, on
             </div>
 
             <div>
-              <div className="mb-1">
+              <div className="flex justify-between items-center mb-1">
                 <label className="block text-sm font-medium text-zinc-700">提示词内容</label>
+                <button
+                  type="button"
+                  onClick={handleOptimize}
+                  disabled={isOptimizing || !form.content}
+                  className="flex items-center text-xs text-zinc-600 hover:text-black transition-colors disabled:opacity-50"
+                >
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  AI 智能优化
+                </button>
               </div>
               <textarea
                 required
@@ -188,8 +220,8 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ isOpen, on
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-zinc-100">
-            <Button type="button" variant="ghost" onClick={onClose}>取消</Button>
-            <Button type="submit" variant="primary">发布</Button>
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>取消</Button>
+            <Button type="submit" variant="primary" isLoading={isSubmitting}>发布</Button>
           </div>
         </form>
       </div>

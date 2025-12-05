@@ -7,9 +7,10 @@ export interface User {
 
 export interface Comment {
   id: string;
-  author: string;
+  author_name: string; // Changed from author to author_name to match DB
+  author_id?: string;
   content: string;
-  createdAt: string;
+  created_at: string; // DB uses snake_case
 }
 
 export interface Prompt {
@@ -18,12 +19,13 @@ export interface Prompt {
   description: string;
   content: string;
   tags: string[];
-  author: string;
+  author_name: string; // Changed from author
+  author_id?: string;
   likes: number;
-  isPaid: boolean;
-  price?: number; // In CNY
-  createdAt: string;
-  comments: Comment[];
+  is_paid: boolean; // DB uses snake_case
+  price?: number;
+  created_at: string;
+  comments?: Comment[];
 }
 
 export type MainCategory = '全部' | '写作' | '编程' | '绘画' | '商业' | '聊天';
