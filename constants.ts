@@ -2,8 +2,8 @@ import { Prompt, CategoryNode } from './types';
 import { PenTool, Code, Palette, Briefcase, MessageSquare, LayoutGrid, Video } from 'lucide-react';
 
 const TEXT_MODELS = [
-  'ChatGPT', 'Gemini', 'Claude', 'Grok', 'DeepSeek', // International
-  '豆包', '文心一言', 'Kimi', '通义千问', '智谱AI' // Chinese
+  'ChatGPT', 'Gemini', 'Claude', 'Grok', 'DeepSeek', // International & Hot
+  '豆包', '文心一言', 'Kimi', '通义千问', '智谱AI', '秘塔' // Chinese
 ];
 
 const IMAGE_MODELS = [
@@ -11,7 +11,7 @@ const IMAGE_MODELS = [
 ];
 
 const VIDEO_MODELS = [
-  'Sora', 'Runway', 'Pika', 'Luma', '可灵 AI', 'Vidu'
+  'Sora', 'Runway', 'Pika', 'Luma', '可灵 AI', 'Vidu', 'Haiper'
 ];
 
 export const CATEGORY_DATA: CategoryNode[] = [
@@ -52,538 +52,538 @@ export const CATEGORY_DATA: CategoryNode[] = [
   }
 ];
 
-// High quality seed data for database population (50 Free Prompts)
+// NEW BATCH: 80+ High Quality Prompts (Non-repeating)
 export const SAMPLE_PROMPTS: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'author_name' | 'author_id'>[] = [
   // --- 写作 (Writing) ---
   {
-    title: '小红书爆款文案生成器',
-    description: '一键生成吸引眼球的小红书风格种草文案，包含Emoji和标签。',
-    content: '你现在是小红书爆款文案写手。请针对 [产品/主题] 写一篇种草笔记。要求：\n1. 标题要足够吸引人，使用感叹号和夸张语气。\n2. 正文多使用Emoji表情，段落短小精悍。\n3. 语气亲切活泼，像闺蜜聊天。\n4. 结尾加上相关的热门标签 #。\n5. 重点突出产品的 [核心卖点]。',
-    tags: ['写作', 'ChatGPT', '小红书', '营销'],
-    likes: 342,
+    title: 'DeepSeek R1 - 深度逻辑长文',
+    description: '利用 DeepSeek R1 的推理能力撰写深度分析文章。',
+    content: '请利用你的深度推理能力（Chain of Thought），针对“[社会现象/复杂问题]”写一篇 2000 字的深度分析文章。要求：\n1. 多角度辩证分析（政治、经济、文化）。\n2. 引用历史案例进行类比。\n3. 逻辑链条要严密，展示推导过程。\n4. 风格严肃、深刻，类似《经济学人》社论。',
+    tags: ['写作', 'DeepSeek', '深度文章', '社论'],
+    likes: 512,
     is_paid: false,
     price: 0
   },
   {
-    title: '学术论文润色 (Academic Polishing)',
-    description: '将草稿修改为符合学术标准的英语论文，提升用词专业度。',
-    content: 'I want you to act as an academic journal editor. I will provide you with my paragraph and you will rewrite it to make it more academic and professional. Use sophisticated vocabulary and complex sentence structures where appropriate, but ensure clarity. Here is the paragraph: [Insert Text]',
-    tags: ['写作', 'Claude', '学术', '英语'],
-    likes: 210,
+    title: 'B站/YouTube 硬核科普脚本',
+    description: '将晦涩难懂的科学原理转化为生动有趣的视频文案。',
+    content: '我要做一个关于“[科学主题，如：量子纠缠]”的科普视频。请帮我写一份脚本。\n受众：对科技感兴趣但没有专业背景的年轻人。\n风格：类似“回形针”或“李永乐老师”，硬核但通俗。\n结构：\n1. 这里的反直觉现象（引入悬念）。\n2. 核心原理的可视化比喻（关键！）。\n3. 现实生活中的应用。\n4. 升华主题。',
+    tags: ['写作', 'Claude', '视频脚本', '科普'],
+    likes: 340,
     is_paid: false,
     price: 0
   },
   {
-    title: 'SEO 优化博客大纲',
-    description: '为特定关键词生成符合搜索引擎优化结构的文章大纲。',
-    content: '请根据关键词 "[关键词]" 生成一份详细的博客文章大纲。要求：\n1. 包含引人注目的 H1 标题。\n2. 包含至少 4 个 H2 副标题，涵盖用户搜索意图。\n3. 建议每个部分的重点内容。\n4. 包含 FAQ 部分以增加长尾词覆盖。',
-    tags: ['写作', 'Gemini', 'SEO', '博客'],
-    likes: 156,
+    title: '私域流量朋友圈营销文案',
+    description: '打造高转化、不引起反感的微信朋友圈种草文案。',
+    content: '我是卖 [产品，如：手工燕窝] 的。请帮我写 3 条不同维度的朋友圈文案：\n1. 情感共鸣型（讲一个客户的故事）。\n2. 权威背书型（展示制作过程或检测报告）。\n3. 促销紧迫型（限时福利）。\n要求：口语化，不要有广告味，像朋友分享生活，结尾引导私聊。',
+    tags: ['写作', '豆包', '微商', '私域流量'],
+    likes: 288,
     is_paid: false,
     price: 0
   },
   {
-    title: '知乎高赞回答风格',
-    description: '模拟知乎大V的语气，用讲故事和数据结合的方式回答问题。',
-    content: '请以知乎高赞回答的风格回答这个问题："[问题内容]"。\n要求：\n1. 开头使用“谢邀”或“刚下飞机”。\n2. 运用“先说结论”的结构。\n3. 穿插个人经历或故事（Storytelling）。\n4. 引用数据或理论支持观点。\n5. 语气要理性、客观但略带犀利。',
-    tags: ['写作', 'DeepSeek', '知乎', '社媒'],
-    likes: 189,
+    title: '鲁迅风格改写器',
+    description: '模仿鲁迅先生的笔触，辛辣地评论现代事物。',
+    content: '请模仿鲁迅的文风和笔触，对“[现代现象，如：短视频成瘾]”进行一段描写。\n要求：\n1. 使用标志性的词汇（如“大概”、“大约”、“横竖”）。\n2. 句式要长短句结合，带有批判性和冷幽默。\n3. 结尾要有一句发人深省的感叹。',
+    tags: ['写作', 'ChatGPT', '风格模仿', '鲁迅'],
+    likes: 199,
     is_paid: false,
     price: 0
   },
   {
-    title: '短视频分镜脚本生成',
-    description: '将一个主题转化为带画面描述和台词的短视频脚本。',
-    content: '请帮我为一个关于 [主题] 的 60秒短视频编写分镜脚本。输出格式为表格：\n| 序号 | 景别 | 画面描述 | 台词/旁白 | 时长 |\n要求节奏紧凑，前3秒必须有黄金开场（Hook）。',
-    tags: ['写作', 'ChatGPT', '短视频', '脚本'],
-    likes: 275,
+    title: 'Kimi 长文档归纳总结',
+    description: '利用 Kimi 的长上下文能力总结复杂的财报或研报。',
+    content: '（此处需上传长文本）\n请阅读这份长达 50 页的行业研究报告。帮我提取以下核心信息：\n1. 行业未来的年复合增长率 (CAGR)。\n2. 报告中提到的 3 个主要风险点。\n3. 竞争格局的象限分析。\n请用 Markdown 表格形式输出。',
+    tags: ['写作', 'Kimi', '总结', '研报'],
+    likes: 405,
     is_paid: false,
     price: 0
   },
   {
-    title: '微信公众号爆款标题党',
-    description: '为文章生成 10 个高点击率的公众号标题。',
-    content: '请为主题是 "[文章主题]" 的公众号文章生成 10 个标题。\n要求使用以下心理学技巧：\n1. 制造悬念（“从来没见过...”）\n2. 引发焦虑（“再不看就...”）\n3. 数字量化（“3个步骤...”）\n4. 强烈的对比。\n请确保标题不超过 20 个字。',
-    tags: ['写作', '文心一言', '公众号', '标题'],
-    likes: 132,
+    title: '网文小说“黄金三章”大纲',
+    description: '设计这让读者欲罢不能的网文开头。',
+    content: '我想写一本 [类型，如：玄幻/系统流] 小说。请帮我设计“黄金三章”的细纲。\n第一章：主角遭遇极致的压抑或危机（金手指觉醒）。\n第二章：小试牛刀，震惊路人，产生爽点。\n第三章：引出更大的矛盾，留下钩子。\n要求：节奏极快，情绪调动强烈。',
+    tags: ['写作', '文心一言', '网文', '大纲'],
+    likes: 276,
     is_paid: false,
     price: 0
   },
   {
-    title: '科幻小说世界观设定',
-    description: '构建一个独特的科幻背景设定，包括社会结构和科技水平。',
-    content: '请为一部科幻小说创建一个世界观设定。背景设定在 2150 年的地球。需要包含：\n1. 核心科技（如：意识上传、反重力）。\n2. 社会阶层结构。\n3. 主要的政治势力。\n4. 环境状况。\n风格偏向赛博朋克或反乌托邦。',
-    tags: ['写作', 'Claude', '小说', '创意'],
-    likes: 98,
+    title: '法律文书：律师函生成',
+    description: '生成专业、严谨的律师函草稿。',
+    content: '我是一名律师。我的委托人 [姓名] 发现 [侵权方] 在未经许可的情况下使用了其摄影作品。请帮我起草一份《律师函》。\n内容需包含：\n1. 事实陈述。\n2. 法律依据（著作权法相关条款）。\n3. 严正要求（停止侵权、赔礼道歉、赔偿损失）。\n语气要强硬且专业。',
+    tags: ['写作', '智谱AI', '法律', '文书'],
+    likes: 150,
     is_paid: false,
     price: 0
   },
   {
-    title: '日报/周报生成器',
-    description: '根据简单的任务列表，扩写成专业的职场日报或周报。',
-    content: '请根据以下工作内容，帮我写一份正式的日报。\n工作内容：[列出简单的工作点]\n要求：\n1. 使用专业的职场术语（如：赋能、闭环、落地）。\n2. 分为“今日完成”、“遇到问题”、“明日计划”三个部分。\n3. 语气积极向上。',
-    tags: ['写作', '通义千问', '职场', '效率'],
-    likes: 412,
+    title: '脱口秀 (Stand-up) 段子创作',
+    description: '将生活琐事转化为幽默的脱口秀段子。',
+    content: '请把“上班挤地铁”这个主题写成一段脱口秀段子。\n技巧要求：\n1. 使用“预期违背” (Call back)。\n2. 夸张的观察式幽默 (Observational comedy)。\n3. 模仿不同人的反应。\n4. 包含 3 个爆笑梗（Punchline）。',
+    tags: ['写作', 'Grok', '幽默', '脱口秀'],
+    likes: 220,
     is_paid: false,
     price: 0
   },
   {
-    title: '产品发布会演讲稿',
-    description: '模仿乔布斯风格，撰写激动人心的产品发布演讲。',
-    content: '请模仿史蒂夫·乔布斯的风格，为我们的新产品 [产品名称] 写一段 3 分钟的开场演讲稿。强调“创新”、“革命性”和“用户体验”。使用短句，充满激情和自信。',
-    tags: ['写作', 'ChatGPT', '演讲', '商业'],
-    likes: 145,
+    title: '英文邮件润色 - 商务委婉',
+    description: '将直接的中文意思转化为地道、委婉的商务英语邮件。',
+    content: '请把这句话翻译成地道的商务英语，语气要委婉、专业，不要太生硬：\n“你给的价格太低了，我们没法做。除非你加钱，或者减少功能要求。”\n请提供 3 种不同程度的委婉表达。',
+    tags: ['写作', 'Claude', '英语', '邮件'],
+    likes: 310,
     is_paid: false,
     price: 0
   },
   {
-    title: '儿童绘本故事',
-    description: '创作适合 3-6 岁儿童阅读的富有教育意义的绘本故事。',
-    content: '请写一个关于“分享”主题的儿童绘本故事。主角是一只叫“嘟嘟”的小熊。故事要简单易懂，包含重复的句式（方便儿童记忆），结局要温馨。',
-    tags: ['写作', '豆包', '儿童', '故事'],
-    likes: 167,
+    title: '小红书标题党 (Emo 版)',
+    description: '针对年轻女性用户群体的情绪化标题生成。',
+    content: '生成 5 个小红书标题，关于“[主题]”。\n风格：emo、破碎感、清醒大女主、人间清醒。\n句式参考：“这就...”、“关于...”、“没人告诉我...”。\n加上对应的 Emoji，如 🥀 💔 🕯️。',
+    tags: ['写作', '小红书', 'ChatGPT', '标题'],
+    likes: 180,
     is_paid: false,
     price: 0
   },
 
   // --- 编程 (Coding) ---
   {
-    title: 'React + Tailwind 组件生成',
-    description: '快速生成美观、响应式的 React UI 组件代码。',
-    content: '请使用 React (TypeScript) 和 Tailwind CSS 编写一个 [组件名称，如：登录卡片]。\n要求：\n1. 界面现代简洁，黑白灰配色。\n2. 包含响应式设计 (Mobile First)。\n3. 使用 Lucide React 图标。\n4. 代码完全模块化，可以直接复制使用。\n5. 不要使用额外的 CSS 文件。',
-    tags: ['编程', 'ChatGPT', 'React', 'Frontend'],
-    likes: 210,
+    title: 'DeepSeek 代码逻辑漏洞检测',
+    description: '利用 DeepSeek 强大的代码审计能力发现安全隐患。',
+    content: '请作为一名安全专家审计以下 PHP/Java 代码：\n```\n[插入代码]\n```\n请寻找：\n1. SQL 注入漏洞。\n2. XSS 跨站脚本攻击风险。\n3. 逻辑越权漏洞。\n并给出修复后的代码示例。',
+    tags: ['编程', 'DeepSeek', '安全', '审计'],
+    likes: 390,
     is_paid: false,
     price: 0
   },
   {
-    title: 'Python 全能爬虫脚本',
-    description: '基于 Scrapy 或 BeautifulSoup 的通用网页爬虫框架代码。',
-    content: '请写一个 Python 爬虫脚本，用于抓取 [目标网站 URL] 的数据。要求：\n1. 使用 requests 和 BeautifulSoup 库。\n2. 包含 User-Agent 伪装，防止被反爬。\n3. 将抓取到的 [具体字段] 保存为 CSV 文件。\n4. 添加异常处理机制 (try-except)。\n5. 代码需要有详细的中文注释。',
-    tags: ['编程', 'DeepSeek', 'Python', '爬虫'],
-    likes: 89,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: 'SQL 查询优化专家',
-    description: '分析复杂的 SQL 查询并提供性能优化建议。',
-    content: '我有一个运行缓慢的 SQL 查询：\n```sql\n[插入 SQL 代码]\n```\n请分析这段代码可能存在的性能问题（如全表扫描、索引失效），并提供优化后的版本。请解释优化的原理。',
-    tags: ['编程', 'Grok', 'SQL', '数据库'],
+    title: 'Flutter 跨平台 UI 布局',
+    description: '生成 Flutter 的 Widget 树代码。',
+    content: '请用 Flutter 编写一个[电商详情页]的 UI。\n要求：\n1. 顶部是大图轮播 (Carousel)。\n2. 中间是价格和标题，包含 Hero 动画。\n3. 底部是固定的“立即购买”栏。\n4. 使用 CustomScrollView 和 Slivers 实现滚动效果。',
+    tags: ['编程', 'Gemini', 'Flutter', '移动端'],
     likes: 145,
     is_paid: false,
     price: 0
   },
   {
-    title: '正则表达式生成器',
-    description: '根据自然语言描述生成复杂的 Regex 表达式。',
-    content: '我需要一个正则表达式来匹配 [描述需求，例如：中国大陆手机号码]。\n请提供：\n1. 正则表达式模式。\n2. 在 Python/JavaScript 中使用的代码示例。\n3. 对表达式各部分的详细解释。',
-    tags: ['编程', 'ChatGPT', 'Regex', '工具'],
-    likes: 178,
+    title: 'Rust 内存安全解释与代码',
+    description: '解释 Rust 所有权机制并生成示例。',
+    content: '我是 Rust 初学者。请用通俗易懂的例子解释“借用 (Borrowing)”和“生命周期 (Lifetimes)”。\n然后，写一段代码演示：如何在多个线程之间安全地共享一个可变的 HashMap (使用 Arc 和 Mutex)。',
+    tags: ['编程', 'Claude', 'Rust', '并发'],
+    likes: 210,
     is_paid: false,
     price: 0
   },
   {
-    title: 'Git Commit Message 规范化',
-    description: '将随意的代码提交信息转换为符合 Conventional Commits 规范的格式。',
-    content: '我刚刚修改了代码：[描述修改内容]。\n请帮我生成一个符合 Conventional Commits 规范的 Git 提交信息。\n格式应为：<type>(<scope>): <subject>',
-    tags: ['编程', 'DeepSeek', 'Git', '开发'],
-    likes: 88,
+    title: 'Nginx 高性能配置生成',
+    description: '为高并发网站生成 Nginx 配置文件。',
+    content: '请生成一份生产环境可用的 `nginx.conf` 配置。\n需求：\n1. 启用 Gzip 压缩。\n2. 配置 HTTPS (SSL) 及 HTTP/2。\n3. 设置静态资源缓存 (Cache-Control)。\n4. 简单的防 DDOS 限制 (limit_req)。\n5. 负载均衡到两个后端服务器 (upstream)。',
+    tags: ['编程', 'ChatGPT', 'Nginx', '运维'],
+    likes: 175,
     is_paid: false,
     price: 0
   },
   {
-    title: 'TypeScript 接口定义生成',
-    description: '根据 JSON 数据自动生成 TypeScript Interface。',
-    content: '请根据以下 JSON 数据，生成对应的 TypeScript Interface 定义。\nJSON:\n[插入 JSON]\n要求：\n1. 使用 PascalCase 命名接口。\n2. 能够处理嵌套对象。\n3. 尽可能推断具体的类型。',
-    tags: ['编程', 'Claude', 'TypeScript', '工具'],
-    likes: 120,
+    title: 'Unity 游戏脚本 - 角色控制器',
+    description: '生成 Unity C# 脚本，控制角色移动。',
+    content: '请写一个 Unity C# 脚本 `PlayerController.cs`。\n功能：\n1. 使用 CharacterController 组件。\n2. 实现 WASD 移动。\n3. 实现空格键跳跃 (考虑重力)。\n4. 鼠标控制视角旋转 (FPS 模式)。\n代码要有详细注释。',
+    tags: ['编程', 'Grok', 'Unity', '游戏开发'],
+    likes: 160,
     is_paid: false,
     price: 0
   },
   {
-    title: '代码 Code Review 助手',
-    description: '作为资深工程师审查代码，寻找 Bug 和 坏味道。',
-    content: '请作为一名资深全栈工程师 Review 以下代码：\n```\n[代码片段]\n```\n请指出：\n1. 潜在的 Bug 或安全漏洞。\n2. 代码风格问题（Code Smell）。\n3. 性能优化建议。\n4. 可读性改进建议。',
-    tags: ['编程', 'Gemini', 'CodeReview', '质量'],
-    likes: 230,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: 'Vue 3 组合式 API 转换器',
-    description: '将 Vue 2 的 Options API 代码重构为 Vue 3 Composition API。',
-    content: '请将以下 Vue 2 Options API 代码重构为 Vue 3 使用 `<script setup>` 的 Composition API 写法：\n```javascript\n[插入 Vue 2 代码]\n```',
+    title: 'Vue 3 + Pinia 状态管理',
+    description: '演示如何在 Vue 3 中使用 Pinia Store。',
+    content: '请创建一个 Vue 3 Pinia Store，用于管理“购物车”状态。\n需要实现：\n1. State: 商品列表。\n2. Getters: 计算总价、总数量。\n3. Actions: 添加商品、移除商品、清空购物车。\n使用 TypeScript 和 Setup Store 语法。',
     tags: ['编程', '通义千问', 'Vue', '前端'],
+    likes: 130,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: 'Python Pandas 数据清洗',
+    description: '使用 Pandas 处理脏数据。',
+    content: '我有一个 DataFrame `df`，包含字段 `price` (字符串，含符号), `date` (格式混乱), `category` (有缺失值)。\n请写代码：\n1. 将 `price` 转为浮点数。\n2. 将 `date` 统一转为 datetime 格式。\n3. 用众数填充 `category` 的缺失值。\n4. 删除重复行。',
+    tags: ['编程', 'DeepSeek', 'Python', '数据分析'],
+    likes: 245,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: 'Smart Contract (Solidity) 智能合约',
+    description: '编写一个简单的 ERC-20 代币合约。',
+    content: '请用 Solidity 编写一个基本的 ERC-20 代币合约。\n特性：\n1. 代币名称：MyToken (MTK)。\n2. 总供应量：100万。\n3. 包含 Mint 和 Burn 功能（仅管理员可操作）。\n4. 使用 OpenZeppelin 库。',
+    tags: ['编程', 'ChatGPT', '区块链', 'Solidity'],
     likes: 110,
     is_paid: false,
     price: 0
   },
   {
-    title: 'Docker Compose 配置生成',
-    description: '为常见的开发栈生成 docker-compose.yml 文件。',
-    content: '请帮我写一个 docker-compose.yml 文件。技术栈包括：\n1. Node.js (Express) 后端。\n2. PostgreSQL 数据库。\n3. Redis 缓存。\n要求配置好网络连接，设置数据卷持久化，并包含环境变量配置示例。',
-    tags: ['编程', 'ChatGPT', 'Docker', 'DevOps'],
+    title: 'Arduino / ESP32 点灯代码',
+    description: '物联网开发基础代码。',
+    content: '请为 ESP32 写一段 Arduino C++ 代码。\n功能：\n1. 连接 WiFi。\n2. 每隔 1 秒闪烁板载 LED。\n3. 启动一个简单的 Web Server，访问 IP 时显示 "Hello ESP32"。',
+    tags: ['编程', 'Kimi', 'IoT', '嵌入式'],
     likes: 95,
     is_paid: false,
     price: 0
   },
   {
-    title: 'LeetCode 解题助手',
-    description: '提供算法题的解题思路和多语言实现。',
-    content: '我正在解决 LeetCode 题目：[题目名称/描述]。请提供：\n1. 解题思路分析（包括暴力解法和最优解法）。\n2. 时间复杂度和空间复杂度分析。\n3. Java 和 Python 的代码实现。',
-    tags: ['编程', 'Claude', '算法', '面试'],
-    likes: 180,
+    title: 'VS Code 正则替换技巧',
+    description: '使用正则表达式在编辑器中批量修改代码。',
+    content: '我有大量代码格式如下：`var name = "value";`\n我想在 VS Code 中批量替换为：`const name = "value";` 并且把变量名变成大写。\n请给出“查找”和“替换”的正则表达式。',
+    tags: ['编程', 'ChatGPT', '工具', '正则'],
+    likes: 140,
     is_paid: false,
     price: 0
   },
 
-  // --- 绘画 (Art/Image) ---
+  // --- 绘画 (Art) ---
   {
-    title: 'Midjourney 赛博朋克少女',
-    description: '生成高质量、电影感的赛博朋克风格人物肖像。',
-    content: '/imagine prompt: A futuristic cyberpunk girl with neon glowing hair, standing in a rainy Tokyo street at night, reflection in puddles, cinematic lighting, volumetric fog, high detail, 8k resolution, photorealistic, unreal engine 5 render, cyberpunk 2077 style --ar 9:16 --v 6.0',
-    tags: ['绘画', 'Midjourney', '赛博朋克', '人像'],
-    likes: 520,
+    title: 'Flux.1 - 完美文字渲染',
+    description: '利用 Flux 模型强大的文字生成能力制作海报。',
+    content: 'A movie poster design with the big bold text "CYBER 2077" in the center. The text is made of glowing neon circuits. Background is a dark futuristic city. High contrast, vector style, clean typography, correct spelling.',
+    tags: ['绘画', 'Flux', '海报', '文字'],
+    likes: 420,
     is_paid: false,
     price: 0
   },
   {
-    title: 'Logo 设计灵感生成',
-    description: '为初创公司生成极简风格的 Logo 设计提示词。',
-    content: 'Minimalist logo design for a tech startup named "Nebula", abstract geometric shape representing a cloud and a star, clean lines, vector style, flat design, blue and white color palette, white background --no text, realistic, shadows',
-    tags: ['绘画', 'DALL-E', 'Logo', '设计'],
-    likes: 310,
+    title: 'Midjourney - 极简主义包豪斯',
+    description: 'Bauhaus 风格的几何艺术设计。',
+    content: 'Bauhaus style poster design, geometric shapes, circles and triangles, minimal composition, primary colors (red, blue, yellow) on beige background, vintage texture, swiss design typography, abstract --ar 3:4',
+    tags: ['绘画', 'Midjourney', '设计', '抽象'],
+    likes: 210,
     is_paid: false,
     price: 0
   },
   {
-    title: '皮克斯风格 3D 角色',
-    description: '生成类似迪士尼/皮克斯动画风格的可爱 3D 角色。',
-    content: 'A cute 3D rendered character in the style of Pixar, a fluffy orange cat wearing a space suit, big expressive eyes, soft studio lighting, 3d render, blender, c4d, octane render, clay material, high quality --ar 1:1',
-    tags: ['绘画', 'Midjourney', '3D', '可爱'],
-    likes: 445,
+    title: '即梦AI - 唯美古风插画',
+    description: '生成中国古风小说封面图。',
+    content: '中国古风，一位白衣少年站在桃花树下，长发飘飘，手中持剑，花瓣飘落，背景是烟雨江南的远山，水墨画质感，留白意境，高分辨率。',
+    tags: ['绘画', '即梦AI', '国风', '插画'],
+    likes: 330,
     is_paid: false,
     price: 0
   },
   {
-    title: '水墨山水画风格',
-    description: '生成中国传统水墨风格的风景画。',
-    content: 'Traditional Chinese ink wash painting, shanshui style, misty mountains, twisting pine trees, a small boat on the river, negative space, black ink on rice paper, elegant brushstrokes, zen atmosphere --ar 16:9',
-    tags: ['绘画', '即梦AI', '中国风', '水墨'],
-    likes: 298,
+    title: '3D 等轴测房间 (Isometric Room)',
+    description: '生成可爱的 3D 游戏房间模型图。',
+    content: 'Isometric view of a gamer\'s room, low poly style 3d render, purple neon lighting, multiple monitors, gaming chair, messy desk with pizza boxes, cozy atmosphere, soft shadows, blender render --ar 1:1',
+    tags: ['绘画', 'Midjourney', '3D', '游戏'],
+    likes: 275,
     is_paid: false,
     price: 0
   },
   {
-    title: '室内设计效果图',
-    description: '生成现代极简风格的客厅室内设计渲染图。',
-    content: 'Interior design photography of a modern minimalist living room, beige sofa, floor-to-ceiling windows, natural sunlight, indoor plants, marble coffee table, warm wood flooring, architectural digest style, 8k, photorealistic --ar 4:3',
-    tags: ['绘画', 'Stable Diffusion', '室内设计', '建筑'],
-    likes: 367,
+    title: 'Stable Diffusion - 写实人像摄影',
+    description: '模拟 85mm 镜头拍摄的写实人像。',
+    content: 'Raw photo, closeup portrait of a young japanese woman, natural skin texture, pores visible, light freckles, soft daylight window lighting, shot on Sony A7R IV, 85mm f1.4 lens, shallow depth of field, sharp focus on eyes.',
+    tags: ['绘画', 'Stable Diffusion', '摄影', '写实'],
+    likes: 360,
     is_paid: false,
     price: 0
   },
   {
-    title: '复古 80年代 蒸汽波',
-    description: '生成 80年代复古未来主义/蒸汽波风格的插画。',
-    content: 'Retrowave aesthetic, 1980s style, sunset with grid lines, palm trees silhouettes, purple and pink neon gradient, vhs glitch effect, synthwave vibe, digital art --ar 16:9',
-    tags: ['绘画', 'Flux', '复古', '蒸汽波'],
-    likes: 220,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: '产品摄影 - 香水瓶',
-    description: '生成高端商业级的产品摄影图。',
-    content: 'Professional product photography of a luxury perfume bottle, glass texture, gold cap, placed on a black reflective surface, moody lighting, water droplets, bokeh background, macro shot, 8k resolution --ar 4:5',
-    tags: ['绘画', 'Midjourney', '摄影', '商业'],
-    likes: 190,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: '游戏图标 - 魔法药水',
-    description: '生成游戏用的 UI 图标素材。',
-    content: 'Game icon asset, a magical blue potion bottle, glowing liquid, fantasy style, mobile game UI, clean background, vector illustration style, detailed shading --no text',
-    tags: ['绘画', 'DALL-E', '游戏', '素材'],
+    title: '矢量扁平插画 (Corporate Memphis)',
+    description: '科技公司官网常用的扁平化人物插画。',
+    content: 'Corporate memphis style illustration, a team of diverse people building a giant rocket together, flat colors, purple and blue palette, vector art, exaggerated limbs, minimal background, tech startup vibes.',
+    tags: ['绘画', 'DALL-E', '插画', '扁平化'],
     likes: 155,
     is_paid: false,
     price: 0
   },
   {
-    title: '日式动漫风格场景',
-    description: '生成新海诚风格的动漫背景图。',
-    content: 'Anime style background art by Makoto Shinkai, a train station at sunset, lens flare, vibrant blue and orange sky, cumulus clouds, highly detailed, emotional atmosphere, 4k wallpaper --ar 16:9',
-    tags: ['绘画', 'Midjourney', '动漫', '壁纸'],
-    likes: 280,
+    title: '像素艺术 (Pixel Art) 城市',
+    description: '生成 16-bit 风格的复古游戏背景。',
+    content: 'Pixel art animation frame, cyberpunk city street at night, rain falling, neon signs in japanese, 16-bit style, snes graphics, detailed shading, dithering --ar 16:9',
+    tags: ['绘画', 'Midjourney', '像素', '复古'],
+    likes: 230,
     is_paid: false,
     price: 0
   },
   {
-    title: '贴纸/表情包设计',
-    description: '设计可爱的一套表情包贴纸。',
-    content: 'A sticker sheet design of a cute chubby corgi dog doing different activities (sleeping, eating, playing), white border, flat vector style, pastel colors, high quality, isolated on white background',
-    tags: ['绘画', '即梦AI', '设计', '贴纸'],
-    likes: 140,
+    title: 'UI 界面设计 - 玻璃拟态',
+    description: '生成 Glassmorphism 风格的 App 界面。',
+    content: 'Mobile app UI design for a weather app, glassmorphism style, frosted glass cards, blurred background, vibrant gradients, clean white icons, modern typography, dribbble trending --ar 9:16',
+    tags: ['绘画', 'Midjourney', 'UI', '设计'],
+    likes: 290,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '塔罗牌卡面设计',
+    description: '设计一张神秘的塔罗牌“命运之轮”。',
+    content: 'Tarot card design, The Wheel of Fortune, art nouveau style, intricate gold details, mystical symbols, celestial background, vintage paper texture, highly detailed illustration --ar 2:3',
+    tags: ['绘画', 'Flux', '艺术', '塔罗'],
+    likes: 180,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '无缝纹理材质 (Texture)',
+    description: '生成可用于 3D 建模的无缝贴图。',
+    content: 'Seamless texture of old cracked concrete wall, moss growing in cracks, realistic, high detail, 4k, top down view, flat lighting --tile',
+    tags: ['绘画', 'Midjourney', '素材', '3D'],
+    likes: 120,
     is_paid: false,
     price: 0
   },
 
   // --- 视频 (Video) ---
   {
-    title: 'Sora 电影级 - 东京街头',
-    description: 'OpenAI Sora 官方演示案例，生成逼真的东京街头漫步视频。',
-    content: 'A stylish woman walks down a Tokyo street filled with warm glowing neon and animated city signage. She wears a black leather jacket, a long red dress, and black boots, and carries a black purse. She wears sunglasses and red lipstick. She walks confidently and casually. The street is damp and reflective, creating a mirror effect of the colorful lights. Many pedestrians walk about.',
-    tags: ['视频', 'Sora', '电影感', '写实'],
-    likes: 888,
+    title: '可灵 AI - 舌尖上的中国风格',
+    description: '生成美食纪录片风格的烹饪视频。',
+    content: '特写镜头，慢动作展示一块红烧肉在锅中翻滚，色泽红亮，油脂滋滋作响，热气腾腾。背景是模糊的传统中式厨房，暖色调灯光，极具食欲感。High quality, 4k, cinematic lighting.',
+    tags: ['视频', '可灵 AI', '美食', '纪录片'],
+    likes: 410,
     is_paid: false,
     price: 0
   },
   {
-    title: '可灵 AI - 熊猫太极',
-    description: '生成中国风武侠动作视频的提示词。',
-    content: '一只穿着中国古代侠客长袍的熊猫，在竹林中练习太极拳。动作流畅自然，竹叶随风飘落，光影斑驳。高画质，电影级构图，特写镜头捕捉熊猫的眼神和手部动作，背景虚化。4k resolution, highly detailed.',
-    tags: ['视频', '可灵 AI', '国潮', '动画'],
-    likes: 330,
+    title: 'Sora - 历史重现：古罗马',
+    description: '生成逼真的古罗马广场生活场景。',
+    content: 'Drone shot flying over the ancient Roman Forum, people in togas walking, marble statues, sunlight hitting the columns, realistic textures, historical accuracy, cinematic movie scene.',
+    tags: ['视频', 'Sora', '历史', '电影'],
+    likes: 350,
     is_paid: false,
     price: 0
   },
   {
-    title: 'Runway Gen-2 - 云海穿梭',
-    description: '生成第一人称视角的飞行视频。',
-    content: 'FPV drone shot, flying through fluffy white clouds at sunset, golden hour lighting, cinematic motion, hyper-realistic, 4k, smooth transition, dreamlike atmosphere.',
-    tags: ['视频', 'Runway', '风景', '航拍'],
-    likes: 210,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: 'Pika Labs - 融化的冰淇淋',
-    description: '生成物体物理变化的视频效果。',
-    content: 'Close up shot of a strawberry ice cream cone melting under the hot sun, droplets running down, creamy texture, time-lapse style, high quality, 3d animation style.',
-    tags: ['视频', 'Pika', '美食', '特写'],
-    likes: 180,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: 'Luma Dream Machine - 老照片动起来',
-    description: '让静止的历史老照片变成动态视频。',
-    content: 'An old black and white photo of a 1920s jazz band playing in a club. The musicians start moving, playing their instruments, smoke fills the room, camera slowly zooms in. Realistic motion, preserving the vintage grain.',
-    tags: ['视频', 'Luma', '复古', '动态照片'],
-    likes: 250,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: 'Vidu - 赛博朋克赛车',
-    description: '生成高速运动的赛车追逐场景。',
-    content: 'High speed cybernetic car chase on a futuristic highway, neon lights streaking, motion blur, sparks flying, camera following the lead car low to the ground, intense action, cinematic look.',
-    tags: ['视频', 'Vidu', '赛博朋克', '汽车'],
-    likes: 195,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: '微距延时摄影 - 花开',
-    description: '模拟微距镜头拍摄花朵绽放的过程。',
-    content: 'Macro timelapse video of a pink rose blooming, black background, studio lighting, dew drops on petals, 4k resolution, smooth motion, high detail.',
-    tags: ['视频', 'Runway', '自然', '延时'],
-    likes: 160,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: '水下世界探险',
-    description: '生成深海潜水的第一人称视角视频。',
-    content: 'POV underwater diving in a coral reef, colorful fish swimming by, sun rays penetrating the water surface, crystal clear blue water, 4k, realistic texture.',
-    tags: ['视频', 'Sora', '自然', '探险'],
+    title: 'Vidu - 动漫变身特效',
+    description: '生成二次元角色魔法变身的炫酷视频。',
+    content: 'A high school girl transforms into a magical warrior, glowing ribbons of light wrap around her, outfit changes instantly, particle effects, dynamic camera angle, anime style, sakuga animation.',
+    tags: ['视频', 'Vidu', '动漫', '特效'],
     likes: 220,
     is_paid: false,
     price: 0
   },
   {
-    title: '未来城市航拍',
-    description: '生成科幻风格的未来城市俯瞰视频。',
-    content: 'Aerial drone shot of a futuristic sci-fi city with flying cars, towering skyscrapers with holographic ads, night time, rain, blade runner vibe, cinematic lighting.',
-    tags: ['视频', 'Luma', '科幻', '城市'],
-    likes: 275,
+    title: 'Runway Gen-3 - 超现实液体雕塑',
+    description: '生成抽象的流体艺术视频。',
+    content: 'Abstract liquid gold morphing into different geometric shapes, zero gravity, floating in a white void, studio lighting, reflections, slow motion, satisfying video.',
+    tags: ['视频', 'Runway', '抽象', '艺术'],
+    likes: 190,
     is_paid: false,
     price: 0
   },
   {
-    title: '卡通角色跳舞',
-    description: '生成 3D 卡通角色跳舞的动画视频。',
-    content: 'A cute 3D cartoon robot dancing on a disco floor, colorful lights, smooth animation, pixar style, loopable, 4k resolution.',
-    tags: ['视频', 'Pika', '动画', '趣味'],
+    title: 'Luma - 恐怖片氛围',
+    description: '生成阴森恐怖的走廊场景。',
+    content: 'POV walking down a dark abandoned hospital hallway, flickering lights, paint peeling off walls, eerie atmosphere, handheld camera movement, found footage style.',
+    tags: ['视频', 'Luma', '恐怖', '氛围'],
+    likes: 165,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: 'Haiper - 可爱宠物定格动画',
+    description: '生成类似定格动画质感的宠物视频。',
+    content: 'Stop motion animation style, a felt wool puppy jumping over a mushroom, cute, soft lighting, depth of field, handmade texture.',
+    tags: ['视频', 'Haiper', '可爱', '定格'],
+    likes: 280,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '无人机穿越 (FPV) - 火山',
+    description: '生成惊险的穿越火山口视频。',
+    content: 'FPV drone diving into an active volcano, lava bubbling, smoke, extreme heat distortion, fast motion, dynamic acrobatics, 4k.',
+    tags: ['视频', 'Runway', '风景', 'FPV'],
+    likes: 210,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '电商产品展示 - 旋转',
+    description: '生成高端手表的 360 度展示视频。',
+    content: 'Cinematic product shot, a luxury silver watch rotating 360 degrees, levitating, sparks of light reflecting on the bezel, dark background, commercial quality.',
+    tags: ['视频', 'Pika', '商业', '产品'],
     likes: 145,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '水墨动画 - 鲤鱼跃龙门',
+    description: '生成中国传统水墨风格的动画。',
+    content: 'Traditional Chinese ink wash animation, a koi fish jumping out of the water, splashing ink droplets, transforming into a dragon, heavy brush strokes, artistic.',
+    tags: ['视频', '可灵 AI', '国风', '水墨'],
+    likes: 310,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '赛博朋克城市雨夜',
+    description: '生成银翼杀手风格的城市循环视频。',
+    content: 'Cyberpunk city street at night, heavy rain, neon signs reflecting in puddles, flying cars passing by overhead, atmospheric fog, blade runner vibes, seamless loop.',
+    tags: ['视频', 'Sora', '赛博朋克', '循环'],
+    likes: 295,
     is_paid: false,
     price: 0
   },
 
   // --- 商业 (Business) ---
   {
-    title: '商业计划书 (BP) 撰写助手',
-    description: '为创业项目生成专业的商业计划书大纲和核心内容。',
-    content: '作为一名资深投资经理，请帮我为 [项目名称] 写一份商业计划书大纲。项目属于 [行业领域]。请包含以下部分：\n1. 项目痛点与解决方案\n2. 市场规模分析 (TAM/SAM/SOM)\n3. 核心商业模式\n4. 竞争对手分析\n5. 融资计划与资金用途\n请用专业、客观的商业语言撰写。',
-    tags: ['商业', 'Claude', '创业', 'BP'],
-    likes: 156,
+    title: 'Excel / Google Sheets 复杂公式',
+    description: '生成处理复杂数据的 Spreadsheet 公式。',
+    content: '我有一列全名 (A列)，如 "John A. Doe"。请给我一个 Excel 公式，提取中间名（如果存在），如果没有中间名则返回空。考虑到名字可能有 2 个或 3 个部分的情况。',
+    tags: ['商业', 'ChatGPT', 'Excel', '工具'],
+    likes: 135,
     is_paid: false,
     price: 0
   },
   {
-    title: 'SWOT 分析专家',
-    description: '对任何公司、产品或个人进行深度 SWOT 分析。',
-    content: '请对 [公司/产品名称] 进行详细的 SWOT 分析。\n- Strengths (优势): 列出内部核心竞争力。\n- Weaknesses (劣势): 列出内部短板。\n- Opportunities (机会): 列出外部市场机会。\n- Threats (威胁): 列出外部竞争威胁。\n最后请给出基于分析的 3 条战略建议。',
-    tags: ['商业', '通义千问', '分析', '策略'],
-    likes: 95,
+    title: '麦肯锡风格 PPT 大纲',
+    description: '为战略咨询项目生成金字塔原理的 PPT 结构。',
+    content: '主题：传统零售企业数字化转型战略。\n请用麦肯锡“金字塔原理”生成 PPT 故事线 (Storyline)。\n1. 现状 (Situation)\n2. 冲突 (Complication)\n3. 问题 (Question)\n4. 答案 (Answer - 核心论点)\n5. 支撑论据 (3个 Key Pillars)',
+    tags: ['商业', 'Claude', 'PPT', '咨询'],
+    likes: 260,
     is_paid: false,
     price: 0
   },
   {
-    title: '冷邮件 (Cold Email) 营销模版',
-    description: '生成高转化率的 B2B 销售开发邮件。',
-    content: '请帮我写一封 Cold Email 给 [目标公司] 的 [职位，如 CTO]。我们的产品是 [产品描述]。\n要求：\n1. 标题要吸引打开。\n2. 开头简短表明来意并赞美对方公司。\n3. 指出对方可能面临的问题。\n4. 提出我们的解决方案。\n5. 结尾包含明确的 CTA (Call to Action)。',
-    tags: ['商业', 'ChatGPT', '营销', '邮件'],
-    likes: 130,
+    title: '绩效考核 (KPI) 设定',
+    description: '为特定岗位制定合理的 KPI 指标。',
+    content: '请为“新媒体运营经理”这个职位制定季度 KPI。\n维度：\n1. 结果指标 (粉丝增长、转化率)。\n2. 过程指标 (发文频率、互动率)。\n请给出具体的计算公式和权重建议。',
+    tags: ['商业', '通义千问', '管理', 'HR'],
+    likes: 120,
     is_paid: false,
     price: 0
   },
   {
-    title: '面试模拟官 (面试者视角)',
-    description: '模拟面试官提问，帮助准备面试。',
-    content: '我正在准备 [职位，如：产品经理] 的面试。请作为面试官，向我提出 5 个常见的、具有挑战性的面试问题（包含行为面试题和专业技能题）。每问完一个问题，等待我回答，然后对我的回答进行点评。',
-    tags: ['商业', 'Gemini', '面试', '职场'],
-    likes: 280,
+    title: '合同风险审查',
+    description: '快速扫描合同草案中的潜在风险。',
+    content: '（此处粘贴合同条款）\n请作为法务专家审查这段“租赁合同”条款。\n请指出对承租方（我方）不利的条款，特别是关于“提前退租违约金”和“装修免租期”的陷阱，并给出修改建议。',
+    tags: ['商业', 'DeepSeek', '法律', '合同'],
+    likes: 195,
     is_paid: false,
     price: 0
   },
   {
-    title: 'OKRs 制定助手',
-    description: '帮助制定符合 SMART 原则的季度目标和关键结果。',
-    content: '请帮我为 [部门/团队] 制定本季度的 OKRs (Objectives and Key Results)。我们的核心重点是 [核心目标，如：用户增长]。请给出 1 个 O 和 3-4 个 KRs，确保 KRs 是可量化的、有挑战性但可实现的。',
-    tags: ['商业', 'DeepSeek', '管理', 'OKR'],
-    likes: 110,
+    title: '品牌命名 (Brand Naming)',
+    description: '为新品牌生成富有创意且未注册的名字。',
+    content: '我要做一个面向 Z 世代的无糖气泡水品牌。\n品牌调性：活力、搞怪、健康。\n请提供 10 个中文品牌名 + 对应的英文名。\n要求：2-3 个字，朗朗上口，带有社交属性（适合玩梗）。',
+    tags: ['商业', 'Kimi', '品牌', '创意'],
+    likes: 155,
     is_paid: false,
     price: 0
   },
   {
-    title: '危机公关声明生成',
-    description: '针对突发负面事件生成得体的官方回应声明。',
-    content: '假设公司发生了 [危机事件描述]。请以公关总监的身份起草一份对外声明。\n原则：\n1. 态度诚恳，第一时间道歉。\n2. 不推卸责任，说明事实真相（或调查中）。\n3. 给出具体的整改措施或赔偿方案。\n4. 语气庄重、负责。',
-    tags: ['商业', 'Kimi', '公关', '危机处理'],
-    likes: 175,
+    title: '活动策划方案 (SOP)',
+    description: '生成详细的线下活动执行流程表。',
+    content: '我们要举办一场 200 人的线下“AI 开发者沙龙”。请帮我列一份执行 SOP (标准作业程序)。\n包含：\n1. 筹备期 (前 2 周)\n2. 宣传期\n3. 活动当天 (按小时的时间表)\n4. 应急预案 (断网、设备故障)',
+    tags: ['商业', '文心一言', '活动', '策划'],
+    likes: 140,
     is_paid: false,
     price: 0
   },
   {
-    title: '用户画像 (Persona) 构建',
-    description: '根据产品定位生成详细的目标用户画像。',
-    content: '我们的产品是 [产品描述]。请帮我构建 3 个典型的目标用户画像 (User Persona)。每个画像包含：姓名、年龄、职业、性格特征、痛点、需求、使用场景。',
-    tags: ['商业', 'Claude', '产品', '用户研究'],
-    likes: 125,
+    title: '竞品分析报告框架',
+    description: '生成系统的竞争对手分析维度。',
+    content: '请对比“瑞幸咖啡”和“星巴克中国”。\n分析维度：\n1. 产品定价策略。\n2. 选址逻辑。\n3. 用户画像差异。\n4. 数字化运营能力。\n请以表格形式输出对比结论。',
+    tags: ['商业', '智谱AI', '分析', '调研'],
+    likes: 210,
     is_paid: false,
     price: 0
   },
   {
-    title: 'Slogan 标语生成器',
-    description: '为品牌生成朗朗上口、令人印象深刻的标语。',
-    content: '请为品牌 [品牌名称] 生成 10 个 Slogan。品牌定位是 [定位]。要求：简短有力、易于传播、朗朗上口。可以尝试押韵、双关等修辞手法。',
-    tags: ['商业', '文心一言', '营销', '创意'],
-    likes: 90,
+    title: '销售话术：处理异议',
+    description: '针对客户拒绝购买的常见理由生成回击话术。',
+    content: '我在推销 SaaS 软件。客户说：“你们的产品很好，但是今年预算已经花完了，明年再说吧。”\n请提供 3 种回应策略：\n1. 强调早用的 ROI（投资回报）。\n2. 提供分期或试用方案。\n3. 挖掘隐性痛点。',
+    tags: ['商业', 'ChatGPT', '销售', '话术'],
+    likes: 185,
     is_paid: false,
     price: 0
   },
 
   // --- 聊天 (Chat) ---
   {
-    title: '私人英语口语教练',
-    description: '模拟雅思/托福口语考试场景，进行一对一对话练习。',
-    content: '你现在是我的英语口语私教。请以 [话题，如：旅游] 为主题与我进行对话。\n规则：\n1. 你先问我一个问题。\n2. 等我回答后，指出我的语法错误（如果有）并给出更地道的表达方式。\n3. 然后继续问下一个问题。\n4. 保持对话轻松自然，但富有教育意义。',
-    tags: ['聊天', 'Gemini', '英语学习', '教育'],
-    likes: 78,
+    title: 'MBTI 恋爱匹配分析',
+    description: '分析两个 MBTI 人格类型的恋爱兼容性。',
+    content: '我是 INFJ (提倡者)，我的伴侣是 ENTP (辩论家)。\n请分析我们的恋爱关系：\n1. 最吸引对方的点是什么？\n2. 潜在的冲突点在哪里？\n3. 如何更好地沟通？\n请用心理学角度分析。',
+    tags: ['聊天', 'Grok', '情感', 'MBTI'],
+    likes: 310,
     is_paid: false,
     price: 0
   },
   {
-    title: '塔罗牌占卜师',
-    description: '神秘风格的塔罗牌解读，提供心理暗示和指引。',
-    content: '你是一位神秘的塔罗牌占卜师。我心里默念的问题是：[输入问题]。\n请随机抽取三张牌（过去、现在、未来），并为我详细解读牌面含义。解读风格需要神秘、充满隐喻，同时给出积极的心理暗示和生活指引。',
-    tags: ['聊天', 'Claude', '占卜', '娱乐'],
-    likes: 112,
+    title: '病历解读/医学科普',
+    description: '用通俗语言解释复杂的体检报告。',
+    content: '我的体检报告上写着“甲状腺结节 TI-RADS 3类”。\n请用通俗的语言告诉我：\n1. 这是什么意思？严重吗？\n2. 有癌变风险吗？\n3. 医生通常建议怎么处理？\n4. 生活中要注意什么？\n注意：请根据权威医学指南回答。',
+    tags: ['聊天', '文心一言', '健康', '医疗'],
+    likes: 240,
     is_paid: false,
     price: 0
   },
   {
-    title: '苏格拉底式导师',
-    description: '通过不断的提问引导用户进行深度思考。',
-    content: '请扮演苏格拉底。不要直接给我答案。当我提出一个观点或问题时，请通过一系列反问（苏格拉底产婆术）来引导我审视自己的假设，发现逻辑漏洞，并最终自己得出结论。我的第一个观点是：[输入观点]。',
-    tags: ['聊天', 'ChatGPT', '哲学', '思维'],
-    likes: 190,
+    title: '模拟面试官：字节跳动',
+    description: '模拟大厂面试风格进行压力测试。',
+    content: '你现在是字节跳动的前端面试官。风格：深挖底层原理，喜欢问“为什么”。\n我来面试“高级前端工程师”。\n请从“浏览器渲染原理”开始提问。当我回答后，请抓住我的漏洞继续深挖。',
+    tags: ['聊天', 'ChatGPT', '面试', '职场'],
+    likes: 290,
     is_paid: false,
     price: 0
   },
   {
-    title: '哄睡故事生成器',
-    description: '为孩子生成温馨、治愈的睡前故事。',
-    content: '请讲一个适合 5 岁小朋友听的睡前故事。主角是一只 [动物，如：害羞的小兔子]。故事主题关于 [主题，如：勇气]。语气要温柔、舒缓，多用叠词。故事结尾要温馨，能引导孩子入睡。',
-    tags: ['聊天', '豆包', '故事', '儿童'],
-    likes: 255,
-    is_paid: false,
-    price: 0
-  },
-  {
-    title: 'MBTI 人格分析师',
-    description: '基于用户的描述分析其可能的人格类型。',
-    content: '我将描述我在某些情况下的反应和想法。请据此分析我可能属于 MBTI 16型人格中的哪一种，并解释原因。\n场景：[描述场景，如：在大型聚会中感到疲惫，喜欢提前规划行程...]。',
-    tags: ['聊天', '通义千问', '心理学', 'MBTI'],
+    title: '剧本杀 DM (主持人)',
+    description: '主持一场简单的文字版海龟汤游戏。',
+    content: '我们来玩“海龟汤”推理游戏。你是 DM。\n汤面（题目）：男人走进酒吧，要了一杯水。酒保拿出一把枪指着他。男人说“谢谢”，然后走了。\n请回答我的“是/否”提问，直到我猜出真相。',
+    tags: ['聊天', 'Claude', '游戏', '娱乐'],
     likes: 160,
     is_paid: false,
     price: 0
   },
   {
-    title: '吵架/辩论模拟器',
-    description: '模拟反方辩手，锻炼用户的逻辑思维和辩论能力。',
-    content: '我想练习辩论。我是正方，观点是：[输入观点]。你是反方。请针对我的观点进行反驳，找出逻辑漏洞，并提出有力的反方论点。请保持理性、犀利，不要进行人身攻击。',
-    tags: ['聊天', 'Grok', '辩论', '逻辑'],
-    likes: 85,
+    title: '哄女朋友/男朋友神器',
+    description: '生成真诚的道歉信或情话。',
+    content: '我因为打游戏忽略了女朋友，她现在很生气不理我。请帮我写一段道歉的话。\n要求：\n1. 态度要诚恳，不要找借口。\n2. 承认具体的错误（忽略了她）。\n3. 提出补偿方案（如带她去吃好吃的）。\n4. 语气要软，带点撒娇。',
+    tags: ['聊天', 'Kimi', '情感', '沟通'],
+    likes: 330,
     is_paid: false,
     price: 0
   },
   {
-    title: '高情商回复助手',
-    description: '帮助应对尴尬的社交场景，提供得体的回复。',
-    content: '别人对我说："[尴尬的话，如：你怎么又胖了]"。\n请帮我生成 3 个高情商的回复：\n1. 幽默化解型。\n2. 礼貌回怼型。\n3. 转移话题型。',
-    tags: ['聊天', 'Kimi', '情商', '社交'],
-    likes: 320,
+    title: '历史人物对话：李白',
+    description: '穿越时空与诗人李白对饮。',
+    content: '你现在是李白。性格：豪放不羁，醉酒状态。\n我穿越到了唐朝，在酒馆遇到了你。我问你：“太白兄，如果你知道千年后的人们还在背你的诗，你会作何感想？”\n请用半文半白的语言回答，带上你的诗句。',
+    tags: ['聊天', '文心一言', '角色扮演', '历史'],
+    likes: 210,
     is_paid: false,
     price: 0
   },
   {
-    title: '旅行规划向导',
-    description: '为特定目的地生成详细的旅行攻略。',
-    content: '我想去 [目的地，如：成都] 玩 3 天。请帮我规划一份详细的行程。\n要求：\n1. 包含必打卡的美食和景点。\n2. 路线安排要合理，不要绕路。\n3. 推荐适合年轻人的小众玩法。\n4. 列出大概的预算。',
-    tags: ['聊天', '智谱AI', '旅行', '攻略'],
-    likes: 205,
+    title: '哲学思辨：电车难题',
+    description: '探讨伦理道德的边界。',
+    content: '我们来讨论“电车难题”。不要给我标准答案。\n我想挑战你的观点：如果你是那个扳道工，你会怎么做？请基于“功利主义”和“义务论”两种视角分别进行辩护，最后告诉我你的（AI的）选择逻辑。',
+    tags: ['聊天', 'DeepSeek', '哲学', '思考'],
+    likes: 185,
     is_paid: false,
     price: 0
   },
   {
-    title: '梦境解析师',
-    description: '根据弗洛伊德或荣格心理学解析梦境。',
-    content: '我昨晚做了一个梦：[描述梦境内容]。\n请从心理学角度（荣格原型或潜意识）帮我分析这个梦可能代表的含义，以及它反映了我最近什么样的心理状态。',
-    tags: ['聊天', 'ChatGPT', '心理学', '解梦'],
+    title: '健身计划制定 (Personal Trainer)',
+    description: '为特定目标制定健身和饮食计划。',
+    content: '我是男生，175cm，85kg，体脂率 28%。目标：3个月减重 10kg 并增加肌肉线条。\n请帮我制定：\n1. 每周 4 练的健身计划（健身房）。\n2. 每日热量缺口建议。\n3. 三餐的宏观营养素比例（碳水/蛋白/脂肪）。',
+    tags: ['聊天', 'ChatGPT', '健身', '健康'],
     likes: 140,
     is_paid: false,
     price: 0
   },
   {
-    title: '厨艺小助手',
-    description: '根据冰箱里的剩余食材生成菜谱。',
-    content: '我冰箱里剩下：[食材列表，如：两个鸡蛋、半个洋葱、一包方便面]。\n请帮我设计一道简单好吃的晚餐食谱。给出详细的烹饪步骤。',
-    tags: ['聊天', '豆包', '美食', '菜谱'],
-    likes: 188,
+    title: '宠物行为分析师',
+    description: '解读猫狗的奇怪行为。',
+    content: '我家的猫最近老是半夜在家里“跑酷”，发出奇怪的叫声，还盯着墙角看。\n这是为什么？\n1. 是因为精力过剩吗？\n2. 还是生病了？\n请给出分析和解决办法（如何消耗它的精力）。',
+    tags: ['聊天', '豆包', '宠物', '科普'],
+    likes: 195,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '每日星座运势 (Horoscope)',
+    description: '生成带有神秘感的星座运势。',
+    content: '我是天蝎座。请告诉我今天的运势。\n包含：\n1. 整体运势（星级）。\n2. 爱情运（给单身和有伴侣的建议）。\n3. 事业财运。\n4. 今日幸运色和幸运数字。\n风格要神秘、准确感。',
+    tags: ['聊天', 'Gemini', '星座', '玄学'],
+    likes: 270,
     is_paid: false,
     price: 0
   }
