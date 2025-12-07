@@ -8,7 +8,9 @@ interface PromptContextType {
   prompts: Prompt[];
   isLoading: boolean;
   addPrompt: (prompt: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'likes'>) => Promise<boolean>;
+  deletePrompt: (id: string) => Promise<void>;
   addComment: (promptId: string, commentContent: string) => Promise<void>;
+  toggleLike: (promptId: string) => Promise<void>;
   seedPrompts: () => Promise<void>;
   selectedCategory: MainCategory;
   setSelectedCategory: (category: MainCategory) => void;
@@ -30,16 +32,16 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch prompts on mount
+  // Fetch prompts when component mounts or user changes
   useEffect(() => {
     fetchPrompts();
-  }, []);
+  }, [user]);
 
   const fetchPrompts = async () => {
     setIsLoading(true);
     try {
-      // Fetch prompts and their comments
-      const { data, error } = await supabase
+      // 1. Fetch all prompts with comments
+      const { data: promptsData, error: promptsError } = await supabase
         .from('prompts')
         .select(`
           *,
@@ -49,15 +51,112 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (promptsError) throw promptsError;
 
-      if (data) {
-        setPrompts(data as Prompt[]);
+      let formattedPrompts: Prompt[] = (promptsData as Prompt[]) || [];
+
+      // 2. If user is logged in, fetch their likes to determine status
+      if (user) {
+        const { data: likesData, error: likesError } = await supabase
+          .from('user_likes')
+          .select('prompt_id')
+          .eq('user_id', user.id);
+
+        if (!likesError && likesData) {
+          const likedPromptIds = new Set(likesData.map(l => l.prompt_id));
+          formattedPrompts = formattedPrompts.map(p => ({
+            ...p,
+            user_has_liked: likedPromptIds.has(p.id)
+          }));
+        }
       }
+
+      setPrompts(formattedPrompts);
     } catch (error) {
       console.error('Error fetching prompts:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const deletePrompt = async (id: string) => {
+    if (!confirm('确定要删除这个提示词吗？此操作无法撤销。')) return;
+
+    // Optimistic update
+    setPrompts(prev => prev.filter(p => p.id !== id));
+
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error deleting prompt:', error);
+      alert('删除失败，可能是权限不足');
+      fetchPrompts(); // Revert
+    }
+  };
+
+  const toggleLike = async (promptId: string) => {
+    if (!user) {
+      alert("请先登录再点赞");
+      return;
+    }
+
+    const promptIndex = prompts.findIndex(p => p.id === promptId);
+    if (promptIndex === -1) return;
+
+    const prompt = prompts[promptIndex];
+    const isLiked = prompt.user_has_liked;
+
+    // Optimistic Update
+    const newPrompts = [...prompts];
+    newPrompts[promptIndex] = {
+      ...prompt,
+      likes: isLiked ? Math.max(0, prompt.likes - 1) : prompt.likes + 1,
+      user_has_liked: !isLiked
+    };
+    setPrompts(newPrompts);
+
+    try {
+      if (isLiked) {
+        // Remove like
+        const { error } = await supabase
+          .from('user_likes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('prompt_id', promptId);
+          
+        if (error) throw error;
+
+        // Decrement counter
+        await supabase
+            .from('prompts')
+            .update({ likes: Math.max(0, prompt.likes - 1) })
+            .eq('id', promptId);
+
+      } else {
+        // Add like
+        const { error } = await supabase
+          .from('user_likes')
+          .insert([{ user_id: user.id, prompt_id: promptId }]);
+        
+        if (error) throw error;
+
+        // Increment counter
+        await supabase
+            .from('prompts')
+            .update({ likes: prompt.likes + 1 })
+            .eq('id', promptId);
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      // Revert on error
+      fetchPrompts();
     }
   };
 
@@ -133,21 +232,29 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       return;
     }
 
-    if (!confirm('确定要将 10 个演示提示词写入数据库吗？')) return;
+    if (!confirm(`确定要将 ${SAMPLE_PROMPTS.length} 个演示提示词写入数据库吗？这可能需要几秒钟。`)) return;
 
     try {
       setIsLoading(true);
-      const promptsToInsert = SAMPLE_PROMPTS.map(p => ({
-        ...p,
-        author_id: user.id,
-        author_name: user.name
-      }));
-
-      const { error } = await supabase
-        .from('prompts')
-        .insert(promptsToInsert);
-
-      if (error) throw error;
+      
+      // Batch insert to avoid payload too large or timeout
+      const BATCH_SIZE = 5;
+      for (let i = 0; i < SAMPLE_PROMPTS.length; i += BATCH_SIZE) {
+        const batch = SAMPLE_PROMPTS.slice(i, i + BATCH_SIZE).map(p => ({
+            ...p,
+            author_id: user.id,
+            author_name: user.name
+        }));
+        
+        const { error } = await supabase
+            .from('prompts')
+            .insert(batch);
+        
+        if (error) {
+            console.error(`Batch ${i/BATCH_SIZE + 1} failed:`, error);
+            throw error;
+        }
+      }
 
       alert('数据填充成功！请刷新页面查看。');
       fetchPrompts(); // Refresh list
@@ -186,7 +293,9 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       prompts,
       isLoading,
       addPrompt,
+      deletePrompt,
       addComment,
+      toggleLike,
       seedPrompts,
       selectedCategory,
       setSelectedCategory,

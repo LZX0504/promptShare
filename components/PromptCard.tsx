@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Prompt } from '../types';
-import { Copy, Heart, Check, Lock } from 'lucide-react';
+import { Copy, Heart, Check, Lock, Trash2 } from 'lucide-react';
+import { usePrompts } from '../contexts/PromptContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -8,8 +10,15 @@ interface PromptCardProps {
 }
 
 export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
+  const { toggleLike, deletePrompt } = usePrompts();
+  const { user } = useAuth();
   const [copied, setCopied] = useState(false);
-  const [liked, setLiked] = useState(false);
+
+  // Admin email check (hardcoded for this example)
+  const ADMIN_EMAIL = 'iamcker@outlook.com';
+  
+  // Allow delete if user is author OR user is admin
+  const canDelete = user && (user.id === prompt.author_id || user.email === ADMIN_EMAIL);
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -21,12 +30,18 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLiked(!liked);
+    toggleLike(prompt.id);
   };
 
   const handleBuy = (e: React.MouseEvent) => {
       e.stopPropagation();
       // Placeholder for buy logic
+      alert('购买功能开发中');
+  }
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    deletePrompt(prompt.id);
   }
 
   return (
@@ -35,7 +50,16 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
       className="group relative bg-white border border-zinc-200 rounded-xl p-5 hover:shadow-lg hover:border-zinc-300 transition-all duration-300 flex flex-col h-full cursor-pointer"
     >
       {/* Badge */}
-      <div className="absolute top-4 right-4 z-10">
+      <div className="absolute top-4 right-4 z-10 flex space-x-2">
+        {canDelete && (
+             <button
+                onClick={handleDelete}
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                title="删除提示词"
+             >
+                 <Trash2 className="w-3.5 h-3.5" />
+             </button>
+        )}
         {prompt.is_paid ? (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-900 text-white">
             ￥{prompt.price}
@@ -47,7 +71,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
         )}
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 pr-16">
         <h3 className="text-lg font-bold text-zinc-900 mb-1 group-hover:text-black transition-colors">
             {prompt.title}
         </h3>
@@ -81,11 +105,12 @@ export const PromptCard: React.FC<PromptCardProps> = ({ prompt, onClick }) => {
         <div className="flex items-center space-x-2">
             <button 
                 onClick={handleLike}
-                className={`p-1.5 rounded-md transition-colors ${liked ? 'text-red-500 bg-red-50' : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100'}`}
+                className={`p-1.5 rounded-md transition-colors ${prompt.user_has_liked ? 'text-red-500 bg-red-50' : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100'}`}
             >
-                <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
+                <Heart className={`w-4 h-4 ${prompt.user_has_liked ? 'fill-current' : ''}`} />
                 <span className="sr-only">Like</span>
             </button>
+            <span className="text-xs text-zinc-400 min-w-[1rem]">{prompt.likes}</span>
             
             {!prompt.is_paid && (
                 <button 

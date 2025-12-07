@@ -7,11 +7,12 @@ import { useAuth } from '../contexts/AuthContext';
 interface HeaderProps {
   onOpenCreateModal: () => void;
   onOpenAuthModal: () => void;
+  onOpenProfile: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenCreateModal, onOpenAuthModal }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenCreateModal, onOpenAuthModal, onOpenProfile }) => {
   const { searchQuery, setSearchQuery } = usePrompts();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   // Helper to get initials
   const getInitials = (name: string) => {
@@ -53,7 +54,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCreateModal, onOpenAuthMod
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
-                 <div className="flex items-center space-x-2">
+                 <button 
+                    onClick={onOpenProfile}
+                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                 >
                     {/* CSS Generated Avatar */}
                     {user.avatar ? (
                       <img 
@@ -67,13 +71,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCreateModal, onOpenAuthMod
                       </div>
                     )}
                     <span className="text-sm font-medium text-zinc-900 hidden lg:block">{user.name}</span>
-                 </div>
-                 <button 
-                  onClick={logout}
-                  className="p-2 text-zinc-400 hover:text-red-500 transition-colors"
-                  title="退出登录"
-                 >
-                   <LogOut className="w-4 h-4" />
                  </button>
               </div>
             ) : (

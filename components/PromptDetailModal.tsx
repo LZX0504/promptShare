@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Heart, Copy, Check, Lock, Send } from 'lucide-react';
+import { X, Heart, Copy, Check, Lock, Send, Trash2 } from 'lucide-react';
 import { Prompt } from '../types';
 import { Button } from './Button';
 import { usePrompts } from '../contexts/PromptContext';
@@ -11,21 +11,29 @@ interface PromptDetailModalProps {
 }
 
 export const PromptDetailModal: React.FC<PromptDetailModalProps> = ({ prompt: initialPrompt, onClose }) => {
-  const { addComment, prompts } = usePrompts(); // Get prompts from context
+  const { addComment, toggleLike, deletePrompt, prompts } = usePrompts();
   const { user } = useAuth();
   const [commentText, setCommentText] = useState('');
   const [copied, setCopied] = useState(false);
-  const [liked, setLiked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Find the live version of the prompt from context to ensure we see new comments immediately
+  // Find the live version of the prompt from context to ensure we see new comments/likes immediately
   const prompt = prompts.find(p => p.id === initialPrompt.id) || initialPrompt;
+
+  // Admin email check (hardcoded for this example)
+  const ADMIN_EMAIL = 'iamcker@outlook.com';
+  const canDelete = user && (user.id === prompt.author_id || user.email === ADMIN_EMAIL);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(prompt.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleDelete = async () => {
+      await deletePrompt(prompt.id);
+      onClose();
+  }
 
   const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,13 +63,24 @@ export const PromptDetailModal: React.FC<PromptDetailModalProps> = ({ prompt: in
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-zinc-100 flex-shrink-0">
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900">{prompt.title}</h2>
-            <div className="flex items-center space-x-2 mt-1">
-              <span className="text-sm text-zinc-500">by {prompt.author_name}</span>
-              <span className="text-zinc-300">•</span>
-              <span className="text-sm text-zinc-500">{formatDate(prompt.created_at)}</span>
+          <div className="flex items-center gap-4">
+            <div>
+                <h2 className="text-xl font-bold text-zinc-900">{prompt.title}</h2>
+                <div className="flex items-center space-x-2 mt-1">
+                <span className="text-sm text-zinc-500">by {prompt.author_name}</span>
+                <span className="text-zinc-300">•</span>
+                <span className="text-sm text-zinc-500">{formatDate(prompt.created_at)}</span>
+                </div>
             </div>
+            {canDelete && (
+                <button 
+                    onClick={handleDelete}
+                    className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                    title="删除此提示词"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
+            )}
           </div>
           <button onClick={onClose} className="text-zinc-400 hover:text-zinc-900 transition-colors">
             <X className="w-6 h-6" />
@@ -124,11 +143,11 @@ export const PromptDetailModal: React.FC<PromptDetailModalProps> = ({ prompt: in
                 <div className="flex items-center space-x-4 mb-8">
                     <Button 
                         variant="secondary" 
-                        onClick={() => setLiked(!liked)}
-                        className={`flex-1 ${liked ? 'bg-red-50 text-red-600' : ''}`}
+                        onClick={() => toggleLike(prompt.id)}
+                        className={`flex-1 ${prompt.user_has_liked ? 'bg-red-50 text-red-600' : ''}`}
                     >
-                        <Heart className={`w-4 h-4 mr-2 ${liked ? 'fill-current' : ''}`} />
-                        {liked ? '已收藏' : '收藏'} ({prompt.likes + (liked ? 1 : 0)})
+                        <Heart className={`w-4 h-4 mr-2 ${prompt.user_has_liked ? 'fill-current' : ''}`} />
+                        {prompt.user_has_liked ? '已收藏' : '收藏'} ({prompt.likes})
                     </Button>
                     {prompt.is_paid && (
                         <Button className="flex-1 bg-zinc-900 text-white">

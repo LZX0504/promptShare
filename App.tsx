@@ -6,6 +6,7 @@ import { PromptCard } from './components/PromptCard';
 import { CreatePromptModal } from './components/CreatePromptModal';
 import { PromptDetailModal } from './components/PromptDetailModal';
 import { AuthModal } from './components/AuthModal';
+import { UserProfileModal } from './components/UserProfileModal';
 import { CATEGORY_DATA } from './constants';
 import { MainCategory, Prompt } from './types';
 import { Sparkles, ArrowRight, ChevronRight, ChevronDown, Database } from 'lucide-react';
@@ -61,7 +62,8 @@ const MarketplacePage: React.FC<{
   onOpenCreateModal: () => void; 
   onSelectPrompt: (p: Prompt) => void;
   onOpenAuthModal: () => void;
-}> = ({ onOpenCreateModal, onSelectPrompt, onOpenAuthModal }) => {
+  onOpenProfile: () => void;
+}> = ({ onOpenCreateModal, onSelectPrompt, onOpenAuthModal, onOpenProfile }) => {
   const { filteredPrompts, selectedCategory, setSelectedCategory, selectedSubCategory, setSelectedSubCategory, isLoading } = usePrompts();
   const [expandedCategory, setExpandedCategory] = useState<MainCategory | null>('全部');
 
@@ -80,7 +82,7 @@ const MarketplacePage: React.FC<{
 
   return (
     <div className="flex flex-col flex-grow">
-       <Header onOpenCreateModal={onOpenCreateModal} onOpenAuthModal={onOpenAuthModal} />
+       <Header onOpenCreateModal={onOpenCreateModal} onOpenAuthModal={onOpenAuthModal} onOpenProfile={onOpenProfile} />
        
        <div className="flex flex-grow max-w-[1600px] mx-auto w-full px-4 sm:px-6">
           {/* Sidebar Navigation */}
@@ -261,6 +263,7 @@ const App: React.FC = () => {
   const [view, setView] = useState<'landing' | 'marketplace'>('landing');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
 
   return (
@@ -275,15 +278,13 @@ const App: React.FC = () => {
               onOpenCreateModal={() => setIsCreateModalOpen(true)} 
               onSelectPrompt={(p) => setSelectedPrompt(p)}
               onOpenAuthModal={() => setIsAuthModalOpen(true)}
+              onOpenProfile={() => setIsProfileModalOpen(true)}
             />
           )}
 
           {/* Footer is rendered inside components conditionally, but for global structure: */}
           {view !== 'landing' && <Footer />}
-          {/* Landing page footer usually separate or fixed, handled in LandingPage or main layout logic. 
-              Refining: The previous layout had footer global. 
-              Let's keep it global but style varies. 
-          */}
+          {/* Landing page footer */}
           {view === 'landing' && (
              <div className="fixed bottom-0 w-full bg-white/50 backdrop-blur-sm border-t border-zinc-100 py-4">
                  <div className="max-w-7xl mx-auto px-4 text-center">
@@ -303,6 +304,12 @@ const App: React.FC = () => {
           <AuthModal 
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}
+          />
+
+          {/* Ensure isProfileModalOpen state is used here */}
+          <UserProfileModal
+            isOpen={isProfileModalOpen}
+            onClose={() => setIsProfileModalOpen(false)}
           />
 
           {selectedPrompt && (

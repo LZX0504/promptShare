@@ -127,6 +127,24 @@ export const SAMPLE_PROMPTS: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'au
     is_paid: false,
     price: 0
   },
+  {
+    title: '产品发布会演讲稿',
+    description: '模仿乔布斯风格，撰写激动人心的产品发布演讲。',
+    content: '请模仿史蒂夫·乔布斯的风格，为我们的新产品 [产品名称] 写一段 3 分钟的开场演讲稿。强调“创新”、“革命性”和“用户体验”。使用短句，充满激情和自信。',
+    tags: ['写作', 'ChatGPT', '演讲', '商业'],
+    likes: 145,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '儿童绘本故事',
+    description: '创作适合 3-6 岁儿童阅读的富有教育意义的绘本故事。',
+    content: '请写一个关于“分享”主题的儿童绘本故事。主角是一只叫“嘟嘟”的小熊。故事要简单易懂，包含重复的句式（方便儿童记忆），结局要温馨。',
+    tags: ['写作', '豆包', '儿童', '故事'],
+    likes: 167,
+    is_paid: false,
+    price: 0
+  },
 
   // --- 编程 (Coding) ---
   {
@@ -198,6 +216,24 @@ export const SAMPLE_PROMPTS: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'au
     content: '请将以下 Vue 2 Options API 代码重构为 Vue 3 使用 `<script setup>` 的 Composition API 写法：\n```javascript\n[插入 Vue 2 代码]\n```',
     tags: ['编程', '通义千问', 'Vue', '前端'],
     likes: 110,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: 'Docker Compose 配置生成',
+    description: '为常见的开发栈生成 docker-compose.yml 文件。',
+    content: '请帮我写一个 docker-compose.yml 文件。技术栈包括：\n1. Node.js (Express) 后端。\n2. PostgreSQL 数据库。\n3. Redis 缓存。\n要求配置好网络连接，设置数据卷持久化，并包含环境变量配置示例。',
+    tags: ['编程', 'ChatGPT', 'Docker', 'DevOps'],
+    likes: 95,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: 'LeetCode 解题助手',
+    description: '提供算法题的解题思路和多语言实现。',
+    content: '我正在解决 LeetCode 题目：[题目名称/描述]。请提供：\n1. 解题思路分析（包括暴力解法和最优解法）。\n2. 时间复杂度和空间复杂度分析。\n3. Java 和 Python 的代码实现。',
+    tags: ['编程', 'Claude', '算法', '面试'],
+    likes: 180,
     is_paid: false,
     price: 0
   },
@@ -275,6 +311,24 @@ export const SAMPLE_PROMPTS: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'au
     is_paid: false,
     price: 0
   },
+  {
+    title: '日式动漫风格场景',
+    description: '生成新海诚风格的动漫背景图。',
+    content: 'Anime style background art by Makoto Shinkai, a train station at sunset, lens flare, vibrant blue and orange sky, cumulus clouds, highly detailed, emotional atmosphere, 4k wallpaper --ar 16:9',
+    tags: ['绘画', 'Midjourney', '动漫', '壁纸'],
+    likes: 280,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '贴纸/表情包设计',
+    description: '设计可爱的一套表情包贴纸。',
+    content: 'A sticker sheet design of a cute chubby corgi dog doing different activities (sleeping, eating, playing), white border, flat vector style, pastel colors, high quality, isolated on white background',
+    tags: ['绘画', '即梦AI', '设计', '贴纸'],
+    likes: 140,
+    is_paid: false,
+    price: 0
+  },
 
   // --- 视频 (Video) ---
   {
@@ -331,6 +385,42 @@ export const SAMPLE_PROMPTS: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'au
     is_paid: false,
     price: 0
   },
+  {
+    title: '微距延时摄影 - 花开',
+    description: '模拟微距镜头拍摄花朵绽放的过程。',
+    content: 'Macro timelapse video of a pink rose blooming, black background, studio lighting, dew drops on petals, 4k resolution, smooth motion, high detail.',
+    tags: ['视频', 'Runway', '自然', '延时'],
+    likes: 160,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '水下世界探险',
+    description: '生成深海潜水的第一人称视角视频。',
+    content: 'POV underwater diving in a coral reef, colorful fish swimming by, sun rays penetrating the water surface, crystal clear blue water, 4k, realistic texture.',
+    tags: ['视频', 'Sora', '自然', '探险'],
+    likes: 220,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '未来城市航拍',
+    description: '生成科幻风格的未来城市俯瞰视频。',
+    content: 'Aerial drone shot of a futuristic sci-fi city with flying cars, towering skyscrapers with holographic ads, night time, rain, blade runner vibe, cinematic lighting.',
+    tags: ['视频', 'Luma', '科幻', '城市'],
+    likes: 275,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '卡通角色跳舞',
+    description: '生成 3D 卡通角色跳舞的动画视频。',
+    content: 'A cute 3D cartoon robot dancing on a disco floor, colorful lights, smooth animation, pixar style, loopable, 4k resolution.',
+    tags: ['视频', 'Pika', '动画', '趣味'],
+    likes: 145,
+    is_paid: false,
+    price: 0
+  },
 
   // --- 商业 (Business) ---
   {
@@ -384,6 +474,24 @@ export const SAMPLE_PROMPTS: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'au
     content: '假设公司发生了 [危机事件描述]。请以公关总监的身份起草一份对外声明。\n原则：\n1. 态度诚恳，第一时间道歉。\n2. 不推卸责任，说明事实真相（或调查中）。\n3. 给出具体的整改措施或赔偿方案。\n4. 语气庄重、负责。',
     tags: ['商业', 'Kimi', '公关', '危机处理'],
     likes: 175,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: '用户画像 (Persona) 构建',
+    description: '根据产品定位生成详细的目标用户画像。',
+    content: '我们的产品是 [产品描述]。请帮我构建 3 个典型的目标用户画像 (User Persona)。每个画像包含：姓名、年龄、职业、性格特征、痛点、需求、使用场景。',
+    tags: ['商业', 'Claude', '产品', '用户研究'],
+    likes: 125,
+    is_paid: false,
+    price: 0
+  },
+  {
+    title: 'Slogan 标语生成器',
+    description: '为品牌生成朗朗上口、令人印象深刻的标语。',
+    content: '请为品牌 [品牌名称] 生成 10 个 Slogan。品牌定位是 [定位]。要求：简短有力、易于传播、朗朗上口。可以尝试押韵、双关等修辞手法。',
+    tags: ['商业', '文心一言', '营销', '创意'],
+    likes: 90,
     is_paid: false,
     price: 0
   },

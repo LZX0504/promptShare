@@ -26,6 +26,7 @@ export interface Prompt {
   price?: number;
   created_at: string;
   comments?: Comment[];
+  user_has_liked?: boolean; // New field for UI state
 }
 
 export type MainCategory = '全部' | '写作' | '编程' | '绘画' | '商业' | '聊天' | '视频';
