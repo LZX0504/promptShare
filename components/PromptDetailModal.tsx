@@ -10,13 +10,16 @@ interface PromptDetailModalProps {
   onClose: () => void;
 }
 
-export const PromptDetailModal: React.FC<PromptDetailModalProps> = ({ prompt, onClose }) => {
-  const { addComment } = usePrompts();
+export const PromptDetailModal: React.FC<PromptDetailModalProps> = ({ prompt: initialPrompt, onClose }) => {
+  const { addComment, prompts } = usePrompts(); // Get prompts from context
   const { user } = useAuth();
   const [commentText, setCommentText] = useState('');
   const [copied, setCopied] = useState(false);
   const [liked, setLiked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Find the live version of the prompt from context to ensure we see new comments immediately
+  const prompt = prompts.find(p => p.id === initialPrompt.id) || initialPrompt;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(prompt.content);
