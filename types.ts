@@ -7,10 +7,10 @@ export interface User {
 
 export interface Comment {
   id: string;
-  author_name: string; // Changed from author to author_name to match DB
+  author_name: string;
   author_id?: string;
   content: string;
-  created_at: string; // DB uses snake_case
+  created_at: string;
 }
 
 export interface Prompt {
@@ -19,16 +19,16 @@ export interface Prompt {
   description: string;
   content: string;
   tags: string[];
-  author_name: string; // Changed from author
+  author_name: string;
   author_id?: string;
   likes: number;
-  is_paid: boolean; // DB uses snake_case
+  is_paid: boolean;
   price?: number;
   created_at: string;
   comments?: Comment[];
 }
 
-export type MainCategory = '全部' | '写作' | '编程' | '绘画' | '商业' | '聊天';
+export type MainCategory = '全部' | '写作' | '编程' | '绘画' | '商业' | '聊天' | '视频';
 
 export interface CategoryNode {
   name: MainCategory;

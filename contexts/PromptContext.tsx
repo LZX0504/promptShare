@@ -2,13 +2,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Prompt, MainCategory, Comment } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
-import { MOCK_PROMPTS } from '../constants';
+import { SAMPLE_PROMPTS } from '../constants';
 
 interface PromptContextType {
   prompts: Prompt[];
   isLoading: boolean;
   addPrompt: (prompt: Omit<Prompt, 'id' | 'created_at' | 'comments' | 'likes'>) => Promise<boolean>;
   addComment: (promptId: string, commentContent: string) => Promise<void>;
+  seedPrompts: () => Promise<void>;
   selectedCategory: MainCategory;
   setSelectedCategory: (category: MainCategory) => void;
   selectedSubCategory: string | null;
@@ -54,9 +55,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setPrompts(data as Prompt[]);
       }
     } catch (error) {
-      console.error('Error fetching prompts (using mock data as fallback):', error);
-      // Fallback to MOCK_PROMPTS so the app is usable while configuring DB
-      setPrompts(MOCK_PROMPTS);
+      console.error('Error fetching prompts:', error);
     } finally {
       setIsLoading(false);
     }
@@ -127,6 +126,39 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
+  // Function to seed database with sample data
+  const seedPrompts = async () => {
+    if (!user) {
+      alert('请先登录才能填充数据');
+      return;
+    }
+
+    if (!confirm('确定要将 10 个演示提示词写入数据库吗？')) return;
+
+    try {
+      setIsLoading(true);
+      const promptsToInsert = SAMPLE_PROMPTS.map(p => ({
+        ...p,
+        author_id: user.id,
+        author_name: user.name
+      }));
+
+      const { error } = await supabase
+        .from('prompts')
+        .insert(promptsToInsert);
+
+      if (error) throw error;
+
+      alert('数据填充成功！请刷新页面查看。');
+      fetchPrompts(); // Refresh list
+    } catch (error) {
+      console.error('Seed error:', error);
+      alert('填充失败，请查看控制台');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredPrompts = prompts.filter(prompt => {
     // 1. Category Filter
     let matchesCategory = true;
@@ -155,6 +187,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       isLoading,
       addPrompt,
       addComment,
+      seedPrompts,
       selectedCategory,
       setSelectedCategory,
       selectedSubCategory,

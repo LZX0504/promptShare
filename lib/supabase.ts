@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// ⚠️ REPLACE THESE WITH YOUR OWN SUPABASE PROJECT CREDENTIALS
+// ⚠️ YOUR SUPABASE PROJECT CREDENTIALS
 // Go to https://supabase.com -> Project Settings -> API
 const supabaseUrl = 'https://hcbfgrzqfdaufasmyddi.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjYmZncnpxZmRhdWZhc215ZGRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5Mjc5MTQsImV4cCI6MjA4MDUwMzkxNH0.hNsLzTHDsixCfBdrnSUsPgm9XT1utMJohS8PxnmRC94';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PromptProvider, usePrompts } from './contexts/PromptContext';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Header } from './components/Header';
 import { PromptCard } from './components/PromptCard';
 import { CreatePromptModal } from './components/CreatePromptModal';
@@ -8,7 +8,7 @@ import { PromptDetailModal } from './components/PromptDetailModal';
 import { AuthModal } from './components/AuthModal';
 import { CATEGORY_DATA } from './constants';
 import { MainCategory, Prompt } from './types';
-import { Sparkles, ArrowRight, ChevronRight, ChevronDown } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronRight, ChevronDown, Database } from 'lucide-react';
 
 // --- Components for Views ---
 
@@ -34,7 +34,7 @@ const LandingPage: React.FC<{ onStart: () => void }> = ({ onStart }) => {
         
         <p className="max-w-2xl mx-auto text-xl text-zinc-500 mb-12 font-light">
           PromptShare 是一个极简风格的提示词市场。
-          寻找适合写作、编程、绘画或聊天的完美指令，释放 AI 的潜能。
+          寻找适合写作、编程、绘画、视频或聊天的完美指令，释放 AI 的潜能。
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -62,7 +62,7 @@ const MarketplacePage: React.FC<{
   onSelectPrompt: (p: Prompt) => void;
   onOpenAuthModal: () => void;
 }> = ({ onOpenCreateModal, onSelectPrompt, onOpenAuthModal }) => {
-  const { filteredPrompts, selectedCategory, setSelectedCategory, selectedSubCategory, setSelectedSubCategory } = usePrompts();
+  const { filteredPrompts, selectedCategory, setSelectedCategory, selectedSubCategory, setSelectedSubCategory, isLoading } = usePrompts();
   const [expandedCategory, setExpandedCategory] = useState<MainCategory | null>('全部');
 
   const toggleCategory = (catName: MainCategory) => {
@@ -189,7 +189,13 @@ const MarketplacePage: React.FC<{
               <span className="text-sm text-zinc-500">{filteredPrompts.length} 个结果</span>
             </div>
 
-            {filteredPrompts.length > 0 ? (
+            {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="h-64 bg-zinc-50 rounded-xl animate-pulse border border-zinc-100"></div>
+                    ))}
+                </div>
+            ) : filteredPrompts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredPrompts.map((prompt) => (
                   <PromptCard 
@@ -211,6 +217,41 @@ const MarketplacePage: React.FC<{
           </main>
        </div>
     </div>
+  );
+};
+
+// --- Footer Component ---
+const Footer: React.FC = () => {
+  const { user } = useAuth();
+  const { seedPrompts } = usePrompts();
+
+  return (
+    <footer className="bg-white border-t border-zinc-100 py-8 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-col md:flex-row items-center md:items-baseline space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
+            <span className="font-semibold text-zinc-900 tracking-tight">PromptShare</span>
+            <span className="text-xs text-zinc-500 font-medium">
+              商业合作 Email: iamcker@outlook.com / +v: lewlel
+            </span>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+           {user && (
+             <button 
+               onClick={seedPrompts}
+               className="text-xs text-zinc-300 hover:text-zinc-500 flex items-center transition-colors"
+               title="填充演示数据 (仅登录可见)"
+             >
+               <Database className="w-3 h-3 mr-1" />
+               填充演示数据
+             </button>
+           )}
+           <p className="text-sm text-zinc-400">
+             © 2025 PromptShare. Build by Chris Mai
+           </p>
+        </div>
+      </div>
+    </footer>
   );
 };
 
@@ -237,19 +278,21 @@ const App: React.FC = () => {
             />
           )}
 
-          <footer className={`bg-white border-t border-zinc-100 py-8 ${view === 'landing' ? 'fixed bottom-0 w-full' : ''}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-              <div className="flex flex-col md:flex-row items-center md:items-baseline space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
-                 <span className="font-semibold text-zinc-900 tracking-tight">PromptShare</span>
-                 <span className="text-xs text-zinc-500 font-medium">
-                    商业合作 Email: iamcker@outlook.com / +v: lewlel
-                 </span>
-              </div>
-              <p className="text-sm text-zinc-400">
-                © 2025 PromptShare. Build by Chris Mai
-              </p>
-            </div>
-          </footer>
+          {/* Footer is rendered inside components conditionally, but for global structure: */}
+          {view !== 'landing' && <Footer />}
+          {/* Landing page footer usually separate or fixed, handled in LandingPage or main layout logic. 
+              Refining: The previous layout had footer global. 
+              Let's keep it global but style varies. 
+          */}
+          {view === 'landing' && (
+             <div className="fixed bottom-0 w-full bg-white/50 backdrop-blur-sm border-t border-zinc-100 py-4">
+                 <div className="max-w-7xl mx-auto px-4 text-center">
+                     <p className="text-sm text-zinc-400">
+                        © 2025 PromptShare. Build by Chris Mai
+                     </p>
+                 </div>
+             </div>
+          )}
 
           <CreatePromptModal 
             isOpen={isCreateModalOpen} 

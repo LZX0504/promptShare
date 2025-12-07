@@ -1,5 +1,5 @@
 {
-  "name": "Copy of PromptShare",
-  "description": "一个极简风格的AI提示词分享市场。发现和分享高质量的AI Prompt，支持免费和付费模式（不需要ai优化功能）",
+  "name": "PromptShare",
+  "description": "一个极简风格的AI提示词分享市场。发现和分享高质量的AI Prompt，支持免费和付费模式。",
   "requestFramePermissions": []
 }
