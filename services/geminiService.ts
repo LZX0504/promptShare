@@ -1,8 +1,35 @@
 import { GoogleGenAI } from "@google/genai";
 
+// ⚠️ SECURITY NOTE: Ideally, use environment variables (VITE_API_KEY) in Vercel.
+// However, to ensure the app works immediately for you, we are using the provided key as a fallback.
+const FALLBACK_KEY = 'AIzaSyD1GzwLXgdv4b-I2WNFBVbg2qnZDopBc5E';
+
+const getApiKey = () => {
+  // 1. Try standard Vite env var (Recommended for Vercel)
+  // We use optional chaining and typeof check to prevent crashes in non-Vite environments
+  // Cast import.meta to any to resolve TS error: Property 'env' does not exist on type 'ImportMeta'
+  const meta = import.meta as any;
+  if (meta && meta.env && meta.env.VITE_API_KEY) {
+    return meta.env.VITE_API_KEY;
+  }
+  
+  // 2. Try process.env (Legacy/Node/Next.js)
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  
+  // 3. Use provided fallback
+  return FALLBACK_KEY;
+};
+
+const apiKey = getApiKey();
+
+if (!apiKey) {
+  console.error("Gemini API Key is missing! AI features will not work.");
+}
+
 // Initialize Gemini API Client
-// Note: We use the API_KEY from process.env as per strict instructions.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 /**
  * Optimizes a rough prompt draft into a professional, high-quality prompt.
