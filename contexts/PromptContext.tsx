@@ -312,9 +312,17 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       alert(`🤖 成功生成并入库了 ${promptsToInsert.length} 个 "${randomCat.name}" 类别的提示词！`);
       fetchPrompts(); // Refresh list
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auto generate error:", error);
-      alert('AI 生成失败，请稍后再试或检查 Key 配额。');
+      // Improved error message for user
+      const msg = error.message || String(error);
+      if (msg.includes('429')) {
+        alert('AI 生成失败：配额耗尽 (Quota Exceeded)。请稍后再试。');
+      } else if (msg.includes('404')) {
+        alert('AI 生成失败：模型未找到或不可用。已切换至稳定版模型，请重试。');
+      } else {
+        alert(`AI 生成失败: ${msg}`);
+      }
     } finally {
       setIsLoading(false);
     }

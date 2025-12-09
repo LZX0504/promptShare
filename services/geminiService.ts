@@ -33,14 +33,14 @@ const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 /**
  * Optimizes a rough prompt draft into a professional, high-quality prompt.
- * Uses the gemini-2.5-flash model for speed and efficiency.
+ * Uses the gemini-1.5-flash model for speed and compatibility.
  */
 export const optimizePromptDraft = async (draft: string): Promise<string> => {
   if (!draft.trim()) return "";
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash', // CHANGED: 2.5 -> 1.5 for stability
       contents: `你是一位专业的提示词工程师（Prompt Engineer）。你的任务是将以下 AI 提示词的原始想法或草稿重写为一个高效、结构化且专业的提示词。
       
       规则：
@@ -85,7 +85,7 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash', // CHANGED: 2.5 -> 1.5 for stability
       contents: prompt,
       config: {
         responseMimeType: "application/json"
@@ -97,9 +97,15 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
     // Clean up potential markdown code blocks if the model ignores the mime type instruction
     const jsonString = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
     
-    return JSON.parse(jsonString);
-  } catch (error) {
+    try {
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.error("Failed to parse JSON from AI response:", text);
+        return [];
+    }
+  } catch (error: any) {
     console.error("Failed to batch generate prompts:", error);
-    return [];
+    // Throw error so UI knows something went wrong
+    throw new Error(error.message || "Unknown API Error");
   }
 };
