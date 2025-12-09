@@ -9,7 +9,7 @@ import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { CATEGORY_DATA } from './constants';
 import { MainCategory, Prompt } from './types';
-import { Sparkles, ArrowRight, ChevronRight, ChevronDown, Database } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronRight, ChevronDown, Database, Bot } from 'lucide-react';
 
 // --- Components for Views ---
 
@@ -225,7 +225,7 @@ const MarketplacePage: React.FC<{
 // --- Footer Component ---
 const Footer: React.FC = () => {
   const { user } = useAuth();
-  const { seedPrompts } = usePrompts();
+  const { seedPrompts, autoGeneratePrompts, isLoading } = usePrompts();
 
   return (
     <footer className="bg-white border-t border-zinc-100 py-8 mt-auto">
@@ -239,14 +239,27 @@ const Footer: React.FC = () => {
         
         <div className="flex items-center space-x-4">
            {user && (
-             <button 
-               onClick={seedPrompts}
-               className="text-xs text-zinc-300 hover:text-zinc-500 flex items-center transition-colors"
-               title="填充演示数据 (仅登录可见)"
-             >
-               <Database className="w-3 h-3 mr-1" />
-               填充演示数据
-             </button>
+             <>
+               <button 
+                 onClick={seedPrompts}
+                 disabled={isLoading}
+                 className="text-xs text-zinc-300 hover:text-zinc-500 flex items-center transition-colors disabled:opacity-50"
+                 title="填充演示数据 (仅登录可见)"
+               >
+                 <Database className="w-3 h-3 mr-1" />
+                 填充演示数据
+               </button>
+               
+               <button 
+                 onClick={autoGeneratePrompts}
+                 disabled={isLoading}
+                 className="text-xs text-indigo-400 hover:text-indigo-600 flex items-center transition-colors font-medium disabled:opacity-50"
+                 title="让 AI 自动生成新提示词"
+               >
+                 <Bot className={`w-3 h-3 mr-1 ${isLoading ? 'animate-pulse' : ''}`} />
+                 {isLoading ? '正在让 AI 思考...' : 'AI 自动生成 (无限)'}
+               </button>
+             </>
            )}
            <p className="text-sm text-zinc-400">
              © 2025 PromptShare. Build by Chris Mai

@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Prompt, MainCategory, Comment } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
-import { SAMPLE_PROMPTS } from '../constants';
+import { SAMPLE_PROMPTS, CATEGORY_DATA } from '../constants';
+import { generateBatchPrompts } from '../services/geminiService';
 
 interface PromptContextType {
   prompts: Prompt[];
@@ -12,6 +13,7 @@ interface PromptContextType {
   addComment: (promptId: string, commentContent: string) => Promise<void>;
   toggleLike: (promptId: string) => Promise<void>;
   seedPrompts: () => Promise<void>;
+  autoGeneratePrompts: () => Promise<void>;
   selectedCategory: MainCategory;
   setSelectedCategory: (category: MainCategory) => void;
   selectedSubCategory: string | null;
@@ -266,6 +268,58 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
+  // NEW: Function to auto-generate prompts using Gemini
+  const autoGeneratePrompts = async () => {
+    if (!user) {
+      alert('请先登录');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // 1. Pick a random category (excluding "全部")
+      const categories = CATEGORY_DATA.filter(c => c.name !== '全部');
+      const randomCat = categories[Math.floor(Math.random() * categories.length)];
+      
+      console.log(`Generating prompts for: ${randomCat.name}`);
+
+      // 2. Call Gemini Service to get JSON data
+      // Generating 3 prompts at a time to keep it fast
+      const generatedData = await generateBatchPrompts(randomCat.name, 3);
+
+      if (!generatedData || generatedData.length === 0) {
+        throw new Error("AI returned empty data");
+      }
+
+      // 3. Format data for Supabase
+      const promptsToInsert = generatedData.map((p: any) => ({
+        title: p.title,
+        description: p.description,
+        content: p.content,
+        tags: Array.isArray(p.tags) ? [...p.tags, 'AI生成'] : [randomCat.name, 'AI生成'],
+        author_id: user.id,
+        author_name: `${user.name} (AI)`, // Mark as AI generated for clarity
+        is_paid: false,
+        price: 0
+      }));
+
+      // 4. Insert into DB
+      const { error } = await supabase.from('prompts').insert(promptsToInsert);
+      
+      if (error) throw error;
+
+      alert(`🤖 成功生成并入库了 ${promptsToInsert.length} 个 "${randomCat.name}" 类别的提示词！`);
+      fetchPrompts(); // Refresh list
+
+    } catch (error) {
+      console.error("Auto generate error:", error);
+      alert('AI 生成失败，请稍后再试或检查 Key 配额。');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredPrompts = prompts.filter(prompt => {
     // 1. Category Filter
     let matchesCategory = true;
@@ -297,6 +351,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       addComment,
       toggleLike,
       seedPrompts,
+      autoGeneratePrompts,
       selectedCategory,
       setSelectedCategory,
       selectedSubCategory,
