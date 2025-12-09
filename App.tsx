@@ -239,28 +239,33 @@ const Footer: React.FC = () => {
         
         <div className="flex items-center space-x-4">
            {user && (
-             <>
                <button 
                  onClick={seedPrompts}
                  disabled={isLoading}
                  className="text-xs text-zinc-300 hover:text-zinc-500 flex items-center transition-colors disabled:opacity-50"
-                 title="填充演示数据 (仅登录可见)"
+                 title="填充演示数据"
                >
                  <Database className="w-3 h-3 mr-1" />
                  填充演示数据
                </button>
-               
-               <button 
-                 onClick={autoGeneratePrompts}
-                 disabled={isLoading}
-                 className="text-xs text-indigo-400 hover:text-indigo-600 flex items-center transition-colors font-medium disabled:opacity-50"
-                 title="让 AI 自动生成新提示词"
-               >
-                 <Bot className={`w-3 h-3 mr-1 ${isLoading ? 'animate-pulse' : ''}`} />
-                 {isLoading ? '正在让 AI 思考...' : 'AI 自动生成 (无限)'}
-               </button>
-             </>
            )}
+           
+           <button 
+             onClick={() => {
+                if (!user) {
+                    alert('请先登录管理员账号才能使用 AI 生成功能');
+                    return;
+                }
+                autoGeneratePrompts();
+             }}
+             disabled={isLoading}
+             className={`text-xs flex items-center transition-colors font-medium disabled:opacity-50 ${user ? 'text-indigo-500 hover:text-indigo-600' : 'text-zinc-400 hover:text-zinc-600'}`}
+             title={user ? "让 AI 自动生成新提示词" : "登录后使用 AI 生成"}
+           >
+             <Bot className={`w-3 h-3 mr-1 ${isLoading ? 'animate-pulse' : ''}`} />
+             {isLoading ? '正在让 AI 思考...' : 'AI 自动生成 (无限)'}
+           </button>
+
            <p className="text-sm text-zinc-400">
              © 2025 PromptShare. Build by Chris Mai
            </p>
