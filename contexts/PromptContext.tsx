@@ -289,7 +289,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       const generatedData = await generateBatchPrompts(randomCat.name, 3);
 
       if (!generatedData || generatedData.length === 0) {
-        throw new Error("AI returned empty data");
+        throw new Error("AI returned empty data or failed to generate JSON.");
       }
 
       // 3. Format data for Supabase
@@ -314,15 +314,9 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     } catch (error: any) {
       console.error("Auto generate error:", error);
-      // Improved error message for user
+      // Show raw error message to help debugging
       const msg = error.message || String(error);
-      if (msg.includes('429')) {
-        alert('AI 生成失败：配额耗尽 (Quota Exceeded)。请稍后再试。');
-      } else if (msg.includes('404')) {
-        alert('AI 生成失败：模型未找到或不可用。已切换至稳定版模型，请重试。');
-      } else {
-        alert(`AI 生成失败: ${msg}`);
-      }
+      alert(`AI 生成失败: ${msg}`);
     } finally {
       setIsLoading(false);
     }
