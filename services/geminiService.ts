@@ -18,18 +18,15 @@ const getApiKey = () => {
     return process.env.API_KEY;
   }
   
-  // 4. HARDCODED FALLBACK
-  // Since environment variables are proving difficult in your deployment,
-  // we use this key directly as a fail-safe.
-  return 'AIzaSyD1GzwLXgdv4b-I2WNFBVbg2qnZDopBc5E';
+  return "";
 };
 
 // Helper to get the client dynamically
 const getAIClient = () => {
   const apiKey = getApiKey();
   if (!apiKey) {
-    // This should technically never happen now because of step 4 above
-    throw new Error("API Key is missing. Please check services/geminiService.ts");
+    console.error("Gemini API Key is missing. Please check your Vercel Environment Variables. The key name must be 'VITE_API_KEY'.");
+    throw new Error("API Key is missing. Please set VITE_API_KEY in your Vercel Environment Variables.");
   }
   return new GoogleGenAI({ apiKey });
 };
