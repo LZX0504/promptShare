@@ -1,12 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
-// ⚠️ SECURITY NOTE: Ideally, use environment variables (VITE_API_KEY) in Vercel.
-// However, to ensure the app works immediately for you, we are using the provided key as a fallback.
-const FALLBACK_KEY = 'AIzaSyD1GzwLXgdv4b-I2WNFBVbg2qnZDopBc5E';
+const LOCAL_STORAGE_KEY = 'gemini_custom_api_key';
+
+export const saveApiKeyToStorage = (key: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_KEY, key.trim());
+  }
+};
 
 const getApiKey = () => {
   // 1. Try standard Vite env var (Recommended for Vercel)
-  // We use optional chaining and typeof check to prevent crashes in non-Vite environments
   // Cast import.meta to any to resolve TS error
   const meta = import.meta as any;
   if (meta && meta.env && meta.env.VITE_API_KEY) {
@@ -18,18 +21,24 @@ const getApiKey = () => {
     return process.env.API_KEY;
   }
   
-  // 3. Use provided fallback
-  return FALLBACK_KEY;
+  // 3. Try Local Storage (User entered key via UI)
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (stored) return stored;
+  }
+  
+  return null;
 };
 
-const apiKey = getApiKey();
-
-if (!apiKey) {
-  console.error("Gemini API Key is missing! AI features will not work.");
-}
-
-// Initialize Gemini API Client
-const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+// We create a helper to get the client dynamically so it picks up the key 
+// even if the user sets it *after* the page loads.
+const getAIClient = () => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("NO_API_KEY");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 /**
  * Optimizes a rough prompt draft into a professional, high-quality prompt.
@@ -39,6 +48,7 @@ export const optimizePromptDraft = async (draft: string): Promise<string> => {
   if (!draft.trim()) return "";
 
   try {
+    const ai = getAIClient();
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: `你是一位专业的提示词工程师（Prompt Engineer）。你的任务是将以下 AI 提示词的原始想法或草稿重写为一个高效、结构化且专业的提示词。
@@ -54,9 +64,10 @@ export const optimizePromptDraft = async (draft: string): Promise<string> => {
     });
 
     return response.text?.trim() || draft;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to optimize prompt with Gemini:", error);
-    // Fallback: return original draft if AI fails
+    // Propagate NO_API_KEY error so UI can prompt user
+    if (error.message === "NO_API_KEY") throw error;
     return draft;
   }
 };
@@ -67,6 +78,7 @@ export const optimizePromptDraft = async (draft: string): Promise<string> => {
  */
 export const generateBatchPrompts = async (category: string, count: number = 3): Promise<any[]> => {
   try {
+    const ai = getAIClient();
     const prompt = `
       请作为一位资深的 Prompt Engineer，为"${category}"这个分类生成 ${count} 个高质量、专业且有趣的 AI 提示词（Prompt）。
       
@@ -105,7 +117,7 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
     }
   } catch (error: any) {
     console.error("Failed to batch generate prompts:", error);
-    // Throw raw error to be handled by caller
+    // Throw raw error to be handled by caller (especially NO_API_KEY or 403)
     throw error;
   }
 };

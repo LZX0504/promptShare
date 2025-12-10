@@ -3,7 +3,7 @@ import { Prompt, MainCategory, Comment } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { SAMPLE_PROMPTS, CATEGORY_DATA } from '../constants';
-import { generateBatchPrompts } from '../services/geminiService';
+import { generateBatchPrompts, saveApiKeyToStorage } from '../services/geminiService';
 
 interface PromptContextType {
   prompts: Prompt[];
@@ -269,7 +269,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   // NEW: Function to auto-generate prompts using Gemini
-  const autoGeneratePrompts = async () => {
+  const autoGeneratePrompts = async (isRetry = false) => {
     if (!user) {
       alert('请先登录');
       return;
@@ -314,11 +314,34 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     } catch (error: any) {
       console.error("Auto generate error:", error);
-      // Show raw error message to help debugging
+      
       const msg = error.message || String(error);
-      alert(`AI 生成失败: ${msg}`);
+      
+      // Detect specific API Key errors (403 Leaked, 400 Bad Request, or our manual NO_API_KEY)
+      if (
+        msg.includes("403") || 
+        msg.includes("leaked") || 
+        msg.includes("API key") || 
+        msg.includes("NO_API_KEY") ||
+        msg.includes("PERMISSION_DENIED")
+      ) {
+          const manualKey = prompt("⚠️ API Key 无效或缺失 (Google 提示 Key 可能已泄漏或配额不足)。\n\n请粘贴您自己的 Google Gemini API Key 以继续使用：");
+          if (manualKey) {
+              saveApiKeyToStorage(manualKey);
+              // Retry immediately with the new key
+              setIsLoading(false); // Reset loading state for retry
+              setTimeout(() => autoGeneratePrompts(true), 100);
+              return;
+          }
+      }
+
+      if (!isRetry) {
+        alert(`AI 生成失败: ${msg}`);
+      }
     } finally {
-      setIsLoading(false);
+      if (!isRetry) {
+        setIsLoading(false);
+      }
     }
   };
 
