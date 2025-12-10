@@ -268,7 +268,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
-  // NEW: Function to auto-generate prompts using Gemini
+  // NEW: Function to auto-generate prompts using Gemini (Parallel Mode)
   const autoGeneratePrompts = async () => {
     if (!user) {
       alert('请先登录');
@@ -278,18 +278,34 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     try {
       setIsLoading(true);
       
-      // 1. Pick a random category (excluding "全部")
+      // 1. Pick a random category
       const categories = CATEGORY_DATA.filter(c => c.name !== '全部');
       const randomCat = categories[Math.floor(Math.random() * categories.length)];
       
-      console.log(`Generating prompts for: ${randomCat.name}`);
+      console.log(`Starting parallel generation for: ${randomCat.name}`);
 
-      // 2. Call Gemini Service to get JSON data
-      // Generating 3 prompts at a time to keep it fast
-      const generatedData = await generateBatchPrompts(randomCat.name, 3);
+      // 2. Parallel Requests:
+      // We want ~45-50 prompts.
+      // Launching 3 parallel requests of 15 prompts each = 45 prompts.
+      // This is faster and safer than 1 request of 50 (which often timeouts).
+      const BATCH_COUNT = 3; 
+      const PROMPTS_PER_BATCH = 15;
 
-      if (!generatedData || generatedData.length === 0) {
-        throw new Error("AI returned empty data or failed to generate JSON.");
+      const requests = Array(BATCH_COUNT).fill(null).map(() => 
+         generateBatchPrompts(randomCat.name, PROMPTS_PER_BATCH)
+           .catch(err => {
+             console.warn("One batch failed, continuing with others:", err);
+             return []; // Return empty array on failure so Promise.all doesn't crash completely
+           })
+      );
+
+      const results = await Promise.all(requests);
+      
+      // Flatten the array of arrays
+      const generatedData = results.flat();
+
+      if (generatedData.length === 0) {
+        throw new Error("All AI batches failed. Please check your API Key or Quota.");
       }
 
       // 3. Format data for Supabase
@@ -299,17 +315,17 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         content: p.content,
         tags: Array.isArray(p.tags) ? [...p.tags, 'AI生成'] : [randomCat.name, 'AI生成'],
         author_id: user.id,
-        author_name: `${user.name} (AI)`, // Mark as AI generated for clarity
+        author_name: `${user.name} (AI)`, 
         is_paid: false,
         price: 0
       }));
 
-      // 4. Insert into DB
+      // 4. Insert into DB (Supabase can handle 50 rows easily)
       const { error } = await supabase.from('prompts').insert(promptsToInsert);
       
       if (error) throw error;
 
-      alert(`🤖 成功生成并入库了 ${promptsToInsert.length} 个 "${randomCat.name}" 类别的提示词！`);
+      alert(`🚀 成功！${promptsToInsert.length} 个 "${randomCat.name}" 类别的提示词已入库！`);
       fetchPrompts(); // Refresh list
 
     } catch (error: any) {
@@ -322,10 +338,9 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         errorStr.includes('401') ||
         errorStr.includes('MISSING_API_KEY');
 
-      // Only prompt for key if it's an Auth error, or if we want to allow user to override any error (like 503)
       if (isApiKeyError || errorStr.includes('503') || errorStr.includes('404')) {
           const newKey = window.prompt(
-            `AI 生成出错 (${isApiKeyError ? 'Key 无效' : 'API 错误'})。\n\n请输入有效的 Google Gemini API Key 以继续：`, 
+            `AI 生成出错 (${error.message || 'API Error'}).\n\n请输入有效的 Google Gemini API Key 以继续：`, 
             ""
           );
           
@@ -344,7 +359,6 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   const filteredPrompts = prompts.filter(prompt => {
-    // 1. Filter by Search Query
     const matchesSearch = 
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -353,15 +367,11 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     if (!matchesSearch) return false;
 
-    // 2. Filter by Category
     if (selectedCategory === '全部') return true;
     
-    // Check if prompt tags contain the category name OR the selected subcategory
     const matchesCategory = prompt.tags.includes(selectedCategory);
     
     if (selectedSubCategory) {
-      // If a subcategory is selected, prompt must match it (either in tags or just logically)
-      // For simplicity, we check if tags include the subcategory string
       return prompt.tags.some(t => t.toLowerCase() === selectedSubCategory.toLowerCase());
     }
 

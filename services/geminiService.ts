@@ -130,7 +130,7 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
       
       要求：
       1. 内容必须是中文。
-      2. 覆盖该分类下的不同子领域（例如如果是编程，可以覆盖 Python, React, SQL 等）。
+      2. 覆盖该分类下的不同子领域。
       3. 返回格式必须是严格的 JSON 数组。
       4. JSON 对象结构必须如下：
          {
@@ -140,6 +140,7 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
            "tags": ["标签1", "标签2", "${category}"]
          }
       5. 内容要有创意，不要生成千篇一律的通用模板。
+      6. 保持内容精简 (Concise)，确保能在单次响应中完整生成所有 ${count} 个条目。
     `;
 
     const response = await generateContentWithFallback(prompt, true);
