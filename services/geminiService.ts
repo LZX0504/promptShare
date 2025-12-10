@@ -1,41 +1,26 @@
 import { GoogleGenAI } from "@google/genai";
 
-const LOCAL_STORAGE_KEY = 'gemini_custom_api_key';
-
-export const saveApiKeyToStorage = (key: string) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LOCAL_STORAGE_KEY, key.trim());
-  }
-};
-
 const getApiKey = () => {
-  // 1. Try standard Vite env var (Recommended for Vercel)
-  // Cast import.meta to any to resolve TS error
+  // 1. Try standard Vite env var (Required for Vercel)
+  // Cast import.meta to any to resolve TS error in some environments
   const meta = import.meta as any;
   if (meta && meta.env && meta.env.VITE_API_KEY) {
     return meta.env.VITE_API_KEY;
   }
   
-  // 2. Try process.env (Legacy/Node/Next.js)
+  // 2. Try process.env (Legacy/Node)
   if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
     return process.env.API_KEY;
-  }
-  
-  // 3. Try Local Storage (User entered key via UI)
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (stored) return stored;
   }
   
   return null;
 };
 
-// We create a helper to get the client dynamically so it picks up the key 
-// even if the user sets it *after* the page loads.
+// Helper to get the client dynamically
 const getAIClient = () => {
   const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error("NO_API_KEY");
+    throw new Error("API Key is missing. Please set VITE_API_KEY in your Vercel Environment Variables.");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -66,9 +51,7 @@ export const optimizePromptDraft = async (draft: string): Promise<string> => {
     return response.text?.trim() || draft;
   } catch (error: any) {
     console.error("Failed to optimize prompt with Gemini:", error);
-    // Propagate NO_API_KEY error so UI can prompt user
-    if (error.message === "NO_API_KEY") throw error;
-    return draft;
+    throw error;
   }
 };
 
@@ -117,7 +100,6 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
     }
   } catch (error: any) {
     console.error("Failed to batch generate prompts:", error);
-    // Throw raw error to be handled by caller (especially NO_API_KEY or 403)
     throw error;
   }
 };
