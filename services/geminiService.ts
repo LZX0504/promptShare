@@ -40,7 +40,7 @@ const getAIClient = () => {
 
 /**
  * Optimizes a rough prompt draft into a professional, high-quality prompt.
- * Uses the gemini-2.5-flash model.
+ * Uses the stable gemini-1.5-flash model.
  */
 export const optimizePromptDraft = async (draft: string): Promise<string> => {
   if (!draft.trim()) return "";
@@ -48,7 +48,7 @@ export const optimizePromptDraft = async (draft: string): Promise<string> => {
   try {
     const ai = getAIClient();
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash', // Changed to 1.5 for stability
       contents: `你是一位专业的提示词工程师（Prompt Engineer）。你的任务是将以下 AI 提示词的原始想法或草稿重写为一个高效、结构化且专业的提示词。
       
       规则：
@@ -95,7 +95,7 @@ export const generateBatchPrompts = async (category: string, count: number = 3):
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash', // Changed to 1.5 for stability
       contents: prompt,
       config: {
         responseMimeType: "application/json"

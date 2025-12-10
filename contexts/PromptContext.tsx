@@ -318,8 +318,9 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       const errorMsg = error.message || String(error);
       
       // Smart retry: If key is missing or invalid, ask user
-      if (errorMsg === 'MISSING_API_KEY' || errorMsg.includes('403') || errorMsg.includes('400')) {
-        const userKey = window.prompt("检测到 API Key 缺失或无效 (可能是 Vercel 配置问题)。\n\n请手动输入您的 Google Gemini API Key，我们将临时保存在本地供您使用：");
+      // Added 503 check here to allow user to try again
+      if (errorMsg === 'MISSING_API_KEY' || errorMsg.includes('403') || errorMsg.includes('400') || errorMsg.includes('503')) {
+        const userKey = window.prompt(`API 错误 (${errorMsg})。\n\n请确认 Vercel 环境变量 VITE_API_KEY 是否正确。\n或者在此处手动输入您的 Google Gemini API Key 以临时使用：`);
         if (userKey) {
             setStoredApiKey(userKey);
             // Retry immediately
