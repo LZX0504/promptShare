@@ -3,7 +3,7 @@ import { Prompt, MainCategory, Comment } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { SAMPLE_PROMPTS, CATEGORY_DATA } from '../constants';
-import { generateBatchPrompts } from '../services/geminiService';
+import { generateBatchPrompts, setStoredApiKey } from '../services/geminiService';
 
 interface PromptContextType {
   prompts: Prompt[];
@@ -314,8 +314,21 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     } catch (error: any) {
       console.error("Auto generate error:", error);
-      // Just show the raw error message from the service
-      alert(`AI 生成失败: ${error.message || String(error)}`);
+      
+      const errorMsg = error.message || String(error);
+      
+      // Smart retry: If key is missing or invalid, ask user
+      if (errorMsg === 'MISSING_API_KEY' || errorMsg.includes('403') || errorMsg.includes('400')) {
+        const userKey = window.prompt("检测到 API Key 缺失或无效 (可能是 Vercel 配置问题)。\n\n请手动输入您的 Google Gemini API Key，我们将临时保存在本地供您使用：");
+        if (userKey) {
+            setStoredApiKey(userKey);
+            // Retry immediately
+            setTimeout(() => autoGeneratePrompts(), 500);
+            return;
+        }
+      }
+
+      alert(`AI 生成失败: ${errorMsg}`);
     } finally {
       setIsLoading(false);
     }

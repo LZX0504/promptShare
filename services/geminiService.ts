@@ -1,16 +1,24 @@
 import { GoogleGenAI } from "@google/genai";
 
+const STORAGE_KEY = 'user_provided_gemini_key';
+
+export const setStoredApiKey = (key: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEY, key.trim());
+  }
+};
+
 const getApiKey = () => {
-  // 1. Try standard Vite env var (Required for Vercel)
-  // Cast import.meta to any to resolve TS error in some environments
+  // 1. Try standard Vite env var
   const meta = import.meta as any;
   if (meta && meta.env && meta.env.VITE_API_KEY) {
     return meta.env.VITE_API_KEY;
   }
   
-  // 2. Try non-standard Vite env var
-  if (meta && meta.env && meta.env.API_KEY) {
-    return meta.env.API_KEY;
+  // 2. Try browser local storage (User manually entered)
+  if (typeof window !== 'undefined') {
+    const storedKey = localStorage.getItem(STORAGE_KEY);
+    if (storedKey) return storedKey;
   }
 
   // 3. Try process.env (Legacy/Node)
@@ -25,8 +33,7 @@ const getApiKey = () => {
 const getAIClient = () => {
   const apiKey = getApiKey();
   if (!apiKey) {
-    console.error("Gemini API Key is missing. Please check your Vercel Environment Variables. The key name must be 'VITE_API_KEY'.");
-    throw new Error("API Key is missing. Please set VITE_API_KEY in your Vercel Environment Variables.");
+    throw new Error("MISSING_API_KEY");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -57,7 +64,8 @@ export const optimizePromptDraft = async (draft: string): Promise<string> => {
     return response.text?.trim() || draft;
   } catch (error: any) {
     console.error("Failed to optimize prompt with Gemini:", error);
-    // Don't throw, just return original draft so user can continue
+    if (error.message === "MISSING_API_KEY") throw error;
+    // Don't throw others, just return original draft so user can continue
     return draft;
   }
 };
