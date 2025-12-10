@@ -43,6 +43,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setIsLoading(true);
     try {
       // 1. Fetch all prompts with comments
+      // Supabase defaults to 1000 rows max. We use .range() to fetch more.
       const { data: promptsData, error: promptsError } = await supabase
         .from('prompts')
         .select(`
@@ -51,7 +52,8 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             id, content, created_at, author_name, author_id
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(0, 9999); // Increase limit to 10,000
 
       if (promptsError) throw promptsError;
 
