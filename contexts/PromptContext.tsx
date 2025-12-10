@@ -2,8 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Prompt, MainCategory, Comment } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
-import { SAMPLE_PROMPTS, CATEGORY_DATA } from '../constants';
-import { generateBatchPrompts, setStoredApiKey } from '../services/geminiService';
+import { CATEGORY_DATA } from '../constants';
 
 interface PromptContextType {
   prompts: Prompt[];
@@ -12,8 +11,6 @@ interface PromptContextType {
   deletePrompt: (id: string) => Promise<void>;
   addComment: (promptId: string, commentContent: string) => Promise<void>;
   toggleLike: (promptId: string) => Promise<void>;
-  seedPrompts: () => Promise<void>;
-  autoGeneratePrompts: () => Promise<void>;
   selectedCategory: MainCategory;
   setSelectedCategory: (category: MainCategory) => void;
   selectedSubCategory: string | null;
@@ -44,20 +41,39 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     try {
       // 1. Fetch all prompts with comments
       // Supabase defaults to 1000 rows max. We use .range() to fetch more.
-      const { data: promptsData, error: promptsError } = await supabase
-        .from('prompts')
-        .select(`
-          *,
-          comments (
-            id, content, created_at, author_name, author_id
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .range(0, 9999); // Increase limit to 10,000
+      // We implement recursive fetch to handle > 1000 rows
+      
+      let allPrompts: Prompt[] = [];
+      let from = 0;
+      let step = 1000;
+      let fetchMore = true;
 
-      if (promptsError) throw promptsError;
+      while (fetchMore) {
+        const { data: promptsData, error: promptsError } = await supabase
+            .from('prompts')
+            .select(`
+            *,
+            comments (
+                id, content, created_at, author_name, author_id
+            )
+            `)
+            .order('created_at', { ascending: false })
+            .range(from, from + step - 1);
 
-      let formattedPrompts: Prompt[] = (promptsData as Prompt[]) || [];
+        if (promptsError) throw promptsError;
+
+        if (promptsData && promptsData.length > 0) {
+            allPrompts = [...allPrompts, ...promptsData as Prompt[]];
+            from += step;
+            if (promptsData.length < step) {
+                fetchMore = false;
+            }
+        } else {
+            fetchMore = false;
+        }
+      }
+
+      let formattedPrompts: Prompt[] = allPrompts;
 
       // 2. If user is logged in, fetch their likes to determine status
       if (user) {
@@ -229,137 +245,6 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
-  // Function to seed database with sample data
-  const seedPrompts = async () => {
-    if (!user) {
-      alert('请先登录才能填充数据');
-      return;
-    }
-
-    if (!confirm(`确定要将 ${SAMPLE_PROMPTS.length} 个演示提示词写入数据库吗？这可能需要几秒钟。`)) return;
-
-    try {
-      setIsLoading(true);
-      
-      // Batch insert to avoid payload too large or timeout
-      const BATCH_SIZE = 5;
-      for (let i = 0; i < SAMPLE_PROMPTS.length; i += BATCH_SIZE) {
-        const batch = SAMPLE_PROMPTS.slice(i, i + BATCH_SIZE).map(p => ({
-            ...p,
-            author_id: user.id,
-            author_name: user.name
-        }));
-        
-        const { error } = await supabase
-            .from('prompts')
-            .insert(batch);
-        
-        if (error) {
-            console.error(`Batch ${i/BATCH_SIZE + 1} failed:`, error);
-            throw error;
-        }
-      }
-
-      alert('数据填充成功！请刷新页面查看。');
-      fetchPrompts(); // Refresh list
-    } catch (error) {
-      console.error('Seed error:', error);
-      alert('填充失败，请查看控制台');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // NEW: Function to auto-generate prompts using Gemini (Parallel Mode)
-  const autoGeneratePrompts = async () => {
-    if (!user) {
-      alert('请先登录');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      
-      // 1. Pick a random category
-      const categories = CATEGORY_DATA.filter(c => c.name !== '全部');
-      const randomCat = categories[Math.floor(Math.random() * categories.length)];
-      
-      console.log(`Starting parallel generation for: ${randomCat.name}`);
-
-      // 2. Parallel Requests:
-      // We want ~45-50 prompts.
-      // Launching 3 parallel requests of 15 prompts each = 45 prompts.
-      // This is faster and safer than 1 request of 50 (which often timeouts).
-      const BATCH_COUNT = 3; 
-      const PROMPTS_PER_BATCH = 15;
-
-      const requests = Array(BATCH_COUNT).fill(null).map(() => 
-         generateBatchPrompts(randomCat.name, PROMPTS_PER_BATCH)
-           .catch(err => {
-             console.warn("One batch failed, continuing with others:", err);
-             return []; // Return empty array on failure so Promise.all doesn't crash completely
-           })
-      );
-
-      const results = await Promise.all(requests);
-      
-      // Flatten the array of arrays
-      const generatedData = results.flat();
-
-      if (generatedData.length === 0) {
-        throw new Error("All AI batches failed. Please check your API Key or Quota.");
-      }
-
-      // 3. Format data for Supabase
-      const promptsToInsert = generatedData.map((p: any) => ({
-        title: p.title,
-        description: p.description,
-        content: p.content,
-        tags: Array.isArray(p.tags) ? [...p.tags, 'AI生成'] : [randomCat.name, 'AI生成'],
-        author_id: user.id,
-        author_name: `${user.name} (AI)`, 
-        is_paid: false,
-        price: 0
-      }));
-
-      // 4. Insert into DB (Supabase can handle 50 rows easily)
-      const { error } = await supabase.from('prompts').insert(promptsToInsert);
-      
-      if (error) throw error;
-
-      alert(`🚀 成功！${promptsToInsert.length} 个 "${randomCat.name}" 类别的提示词已入库！`);
-      fetchPrompts(); // Refresh list
-
-    } catch (error: any) {
-      console.error("Auto generate error:", error);
-      
-      const errorStr = String(error);
-      const isApiKeyError = 
-        errorStr.includes('API key') || 
-        errorStr.includes('403') || 
-        errorStr.includes('401') ||
-        errorStr.includes('MISSING_API_KEY');
-
-      if (isApiKeyError || errorStr.includes('503') || errorStr.includes('404')) {
-          const newKey = window.prompt(
-            `AI 生成出错 (${error.message || 'API Error'}).\n\n请输入有效的 Google Gemini API Key 以继续：`, 
-            ""
-          );
-          
-          if (newKey) {
-            setStoredApiKey(newKey);
-            // Retry automatically
-            setTimeout(() => autoGeneratePrompts(), 500);
-            return;
-          }
-      } else {
-         alert(`AI 生成失败: ${error.message || String(error)}`);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const filteredPrompts = prompts.filter(prompt => {
     const matchesSearch = 
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -388,8 +273,6 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       deletePrompt,
       addComment,
       toggleLike,
-      seedPrompts,
-      autoGeneratePrompts,
       selectedCategory,
       setSelectedCategory,
       selectedSubCategory,

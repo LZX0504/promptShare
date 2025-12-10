@@ -9,7 +9,7 @@ import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { CATEGORY_DATA } from './constants';
 import { MainCategory, Prompt } from './types';
-import { Sparkles, ArrowRight, ChevronRight, ChevronDown, Database, Bot } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronRight, ChevronDown } from 'lucide-react';
 
 // --- Components for Views ---
 
@@ -23,10 +23,6 @@ const LandingPage: React.FC<{ onStart: () => void }> = ({ onStart }) => {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto py-20">
-        <div className="inline-flex items-center px-3 py-1 rounded-full bg-zinc-100 text-xs font-medium text-zinc-800 mb-8 border border-zinc-200">
-          <Sparkles className="w-3 h-3 mr-2" />
-          现已支持 Gemini AI 智能优化
-        </div>
         
         <h1 className="text-5xl sm:text-7xl font-bold text-zinc-900 tracking-tight mb-8 leading-[1.1]">
           发现与分享 <br />
@@ -224,9 +220,6 @@ const MarketplacePage: React.FC<{
 
 // --- Footer Component ---
 const Footer: React.FC = () => {
-  const { user } = useAuth();
-  const { seedPrompts, autoGeneratePrompts, isLoading } = usePrompts();
-
   return (
     <footer className="bg-white border-t border-zinc-100 py-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
@@ -238,34 +231,6 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-4">
-           {user && (
-               <button 
-                 onClick={seedPrompts}
-                 disabled={isLoading}
-                 className="text-xs text-zinc-300 hover:text-zinc-500 flex items-center transition-colors disabled:opacity-50"
-                 title="填充演示数据"
-               >
-                 <Database className="w-3 h-3 mr-1" />
-                 填充演示数据
-               </button>
-           )}
-           
-           <button 
-             onClick={() => {
-                if (!user) {
-                    alert('请先登录管理员账号才能使用 AI 生成功能');
-                    return;
-                }
-                autoGeneratePrompts();
-             }}
-             disabled={isLoading}
-             className={`text-xs flex items-center transition-colors font-medium disabled:opacity-50 ${user ? 'text-indigo-500 hover:text-indigo-600' : 'text-zinc-400 hover:text-zinc-600'}`}
-             title={user ? "让 AI 自动生成新提示词" : "登录后使用 AI 生成"}
-           >
-             <Bot className={`w-3 h-3 mr-1 ${isLoading ? 'animate-pulse' : ''}`} />
-             {isLoading ? '正在让 AI 思考...' : 'AI 自动生成 (无限)'}
-           </button>
-
            <p className="text-sm text-zinc-400">
              © 2025 PromptShare. Build by Chris Mai
            </p>
