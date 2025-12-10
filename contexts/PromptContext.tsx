@@ -315,46 +315,57 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     } catch (error: any) {
       console.error("Auto generate error:", error);
       
-      const errorMsg = error.message || String(error);
-      
-      // Smart retry: If key is missing or invalid, ask user
-      // Added 503 check here to allow user to try again
-      if (errorMsg === 'MISSING_API_KEY' || errorMsg.includes('403') || errorMsg.includes('400') || errorMsg.includes('503')) {
-        const userKey = window.prompt(`API 错误 (${errorMsg})。\n\n请确认 Vercel 环境变量 VITE_API_KEY 是否正确。\n或者在此处手动输入您的 Google Gemini API Key 以临时使用：`);
-        if (userKey) {
-            setStoredApiKey(userKey);
-            // Retry immediately
+      const errorStr = String(error);
+      const isApiKeyError = 
+        errorStr.includes('API key') || 
+        errorStr.includes('403') || 
+        errorStr.includes('401') ||
+        errorStr.includes('MISSING_API_KEY');
+
+      // Only prompt for key if it's an Auth error, or if we want to allow user to override any error (like 503)
+      if (isApiKeyError || errorStr.includes('503') || errorStr.includes('404')) {
+          const newKey = window.prompt(
+            `AI 生成出错 (${isApiKeyError ? 'Key 无效' : 'API 错误'})。\n\n请输入有效的 Google Gemini API Key 以继续：`, 
+            ""
+          );
+          
+          if (newKey) {
+            setStoredApiKey(newKey);
+            // Retry automatically
             setTimeout(() => autoGeneratePrompts(), 500);
             return;
-        }
+          }
+      } else {
+         alert(`AI 生成失败: ${error.message || String(error)}`);
       }
-
-      alert(`AI 生成失败: ${errorMsg}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const filteredPrompts = prompts.filter(prompt => {
-    // 1. Category Filter
-    let matchesCategory = true;
-    if (selectedCategory !== '全部') {
-      matchesCategory = prompt.tags?.includes(selectedCategory) || false;
-    }
-
-    // 2. SubCategory Filter
-    let matchesSubCategory = true;
-    if (selectedSubCategory) {
-      matchesSubCategory = prompt.tags?.includes(selectedSubCategory) || false;
-    }
-
-    // 3. Search Filter
+    // 1. Filter by Search Query
     const matchesSearch = 
-      prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (prompt.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ?? false);
+      prompt.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    // 2. Filter by Category
+    if (selectedCategory === '全部') return true;
     
-    return matchesCategory && matchesSubCategory && matchesSearch;
+    // Check if prompt tags contain the category name OR the selected subcategory
+    const matchesCategory = prompt.tags.includes(selectedCategory);
+    
+    if (selectedSubCategory) {
+      // If a subcategory is selected, prompt must match it (either in tags or just logically)
+      // For simplicity, we check if tags include the subcategory string
+      return prompt.tags.some(t => t.toLowerCase() === selectedSubCategory.toLowerCase());
+    }
+
+    return matchesCategory;
   });
 
   return (
